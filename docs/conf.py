@@ -7,3 +7,4 @@ author = "Claudio Jolowicz"
 copyright = f"{datetime.now().year}, {author}"
 language = "en"
 html_theme = "furo"
+extensions = ["myst_parser"]

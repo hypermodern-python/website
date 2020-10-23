@@ -1,3 +1,4 @@
 furo==2020.10.15b13
+myst-parser==0.12.10
 sphinx==3.2.1
 sphinx-autobuild==2020.9.1
