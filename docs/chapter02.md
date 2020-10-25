@@ -821,8 +821,6 @@ by Jules Verne (1870)
 (source: [Internet Archive] via [The Public Domain Review]).
 ```
 
-![verne09]
-
 [Bruce Eckel]: https://en.wikipedia.org/wiki/Bruce_Eckel
 [Cebuano Wikipedia]: https://en.wikipedia.org/wiki/Lsjbot
 [Coverage.py]: https://coverage.readthedocs.io/
