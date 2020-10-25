@@ -73,12 +73,12 @@ Python 3.8.6
 ### Installing Python with pyenv
 
 ```{tip}
-If you are working on Linux,
-you may be able to use the package manager of your Linux distribution.
-For example, on [Fedora] you can install multiple Python versions from binary packages with ``dnf``.
+On some Linux distributions,
+you may be able to install multiple Python versions from binary packages.
+For example, on [Fedora] you can install multiple Python interpreters using ``dnf``.
 On a Debian-based Linux distribution such as Ubuntu,
 you can install multiple Python versions from the [deadsnakes PPA].
-You can then invoke a specific Python version from the console using its versioned name, such as ``python3.9``.
+Invoke specific Python versions from the console using their versioned name, such as ``python3.9``.
 ```
 
 If you are working on Linux, Unix, or Mac, or using the [Windows Subsystem for Linux],
@@ -180,7 +180,9 @@ Inside your repository, initialize a new Python project:
 poetry init
 ```
 
-This command will create a `pyproject.toml` file with the following contents:
+This command will create a `pyproject.toml` file,
+containing the package configuration in [TOML] format:
+
 
 ```toml
 # pyproject.toml
@@ -200,8 +202,8 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 ```
 
-The `pyproject.toml` file contains the entire package configuration in [TOML] format.
-This configuration file was specified in [PEP 517] and [PEP 518],
+```{note}
+The `pyproject.toml` configuration file was specified in [PEP 517] and [PEP 518],
 and consists of two sections (or *tables*, in TOML parlance):
 
 - The ``build-system`` table declares the requirements and entry point
@@ -212,8 +214,22 @@ and consists of two sections (or *tables*, in TOML parlance):
   contains the metadata for your package,
   such as its name, version, and authors,
   as well as the list of dependencies for the package.
+```
 
-Let's add some metadata to the package:
+Poetry added a dependency on Python 3.9,
+because this is the Python version you ran it in.
+Support the previous release as well by changing it to Python 3.8:
+
+```toml
+[tool.poetry.dependencies]
+python = "^3.8"
+```
+
+The caret (`^`) in front of the version number means "up to the next major release".
+In other words, you are promising that your package won't break when users upgrade to Python 3.9 or 3.10,
+but giving no guarantees for its use with a future [Python 4.0].
+
+Let's also update the metadata for the package:
 
 ```toml
 # pyproject.toml
@@ -230,19 +246,6 @@ repository = "https://github.com/<username>/<repository>"
 Refer to the [Poetry documentation][pyproject.toml]
 for a detailed description of each configuration key.
 ```
-
-Poetry added a dependency on Python 3.9,
-because this is the Python version you ran it in.
-Support the previous release as well by changing this to Python 3.8:
-
-```toml
-[tool.poetry.dependencies]
-python = "^3.8"
-```
-
-The caret (`^`) in front of the version number means "up to the next major release".
-In other words, you are promising that your package won't break when users upgrade to Python 3.9 or 3.10,
-but giving no guarantees for its use with a future [Python 4.0].
 
 ## Creating a Python package
 
@@ -620,9 +623,8 @@ Uploading your package to PyPI allows others to install it with [pip], like so:
 pip install hypermodern-python
 ```
 
-```{tip}
-The next section shows another method for installing Python applications from PyPI,
-which avoids some of the pitfalls associated with the command above.
+```{warning}
+See the next section to avoid some pitfalls when using pip.
 ```
 
 Create an account on [PyPI] using *Register* in the top menu,
@@ -656,35 +658,116 @@ Password:
  - Uploading hypermodern_python-0.1.0-py3-none-any.whl 100%
 ```
 
+```{note}
 In the last chapter of this guide, we are going to automate the PyPI release process.
 Automation helps you ensure your Python package passes all checks before it is published,
 and keeps the build and upload process itself reliable.
+```
+
+## Installing packages with pip
+
+![opera04]
+
+With distribution archives of your package on PyPI,
+users can add it as a dependency to their own Python projects.
+Wheels and sdists are standard package formats in the Python world,
+so this will also work with packaging tools other than Poetry.
+For example, your package can be added to a [requirements.txt] or [Pipfile][pipenv] like any other package.
+
+Users can also install your package and its entry-point script directly to their system.
+In the case of our example application,
+this allows them to invoke it as `hypermodern-python`,
+without prefixing the command by `poetry run`,
+and without having Poetry installed.
+
+The most common way to do so is [pip],
+the package installer that comes bundled with Python.
+This is a simple and widely available installation method,
+but it comes with two caveats:
+
+1. Specify the target Python installation, by using `pythonX.Y -m pip` instead of plain `pip`.
+   If you don't care about the minor version, `python3 -m pip` is also fine.
+2. Keep your packages separate from the system installation.
+   The `--user` option installs packages to a location in your home directory,
+   the [per user site-packages directory][PEP 370].
+
+For example, this would add your program to the user packages for Python 3.9:
+
+```sh
+python3.9 -m pip install --user hypermodern-python
+```
+
+```{note}
+If the `python3.9` command cannot be located,
+use `py -3.9` instead (on Windows),
+or enable it with `pyenv shell 3.9.0` (if you're using pyenv).
+```
+
+Users also need to add the user script directory to their `PATH` environment variable.
+This directory is located in `~/.local/bin` on Unix (including Mac), and `%APPDATA%\Python\Scripts` on Windows.
+See the next section for a simple cross-platform way to take care of this.
 
 ## Installing applications with pipx
 
-While [pip] is the workhorse of the Python packaging ecosystem,
-you should use higher-level tools to install your package:
+![opera04]
 
-- If the package is an application, install it with [pipx] (see below).
-- If the package is a library, install it with [poetry add] in other Poetry-managed projects.
-
-```{tip}
-If the other project is not managed by Poetry,
-use whatever method the other project uses.
-Once your package is on PyPI, it is no longer tied to a specific tool like Poetry.
-You can add your package to a [requirements.txt] or [Pipfile][pipenv],
-or install your project into a virtual environment with plain [pip].
-```
-
-The primary benefit of these installation methods is that
-your package is installed into an isolated environment,
+[pipx] is a higher-level tool built on top of pip,
+and designed specifically for the installation of Python applications.
+Its primary benefit is that applications are installed into isolated environments,
 without polluting the system environment, or the environments of other applications.
 This way, applications can use specific versions of their direct and indirect dependencies,
 without getting in each other's way.
 
-Install [pipx] using pip.
+Install pipx using pip, and ensure the script directory is on your `PATH`:
+
+```sh
+python3.9 -m pip install --user pipx
+python3.9 -m pipx ensurepath
+```
+
+Let's try pipx on our own application!
+
+````{note}
+If you already installed the application with pip in the previous section,
+you should uninstall it first:
+
+   ```sh
+   python3.9 -m pip uninstall hypermodern-python
+   ```
+````
+
+Installing applications with pipx is straightforward:
+
+```sh
+pipx install hypermodern-python
+```
+
+If all went well,
+you should now be able to invoke your application directly:
+
+```sh
+$ hypermodern-python --version
+
+hypermodern-python, version 0.1.0
+```
 
 ## Summary
+
+![opera05]
+
+In this chapter, we set up a basic Python developer environment,
+consisting of the following tools:
+
+- [pyenv] (on Linux, Unix, and Mac)
+- [py][Python launcher for Windows] (on Windows)
+- [Poetry]
+- [pipx]
+
+We also created a simple Python package using Poetry,
+with dependencies on [click] and [httpx].
+
+Finally we published the package to [PyPI],
+and installed it using pipx.
 
 ```{admonition} Credits
 :class: seealso
@@ -706,6 +789,7 @@ by Albert Robida, ca 1902
 [HTTP GET]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods
 [JSON]: https://www.json.org/
 [MIT license]: https://choosealicense.com/licenses/mit/
+[PEP 370]: https://www.python.org/dev/peps/pep-0370
 [PEP 517]: https://www.python.org/dev/peps/pep-0517/
 [PEP 518]: https://www.python.org/dev/peps/pep-0518/
 [PEP 8]: https://www.python.org/dev/peps/pep-0008/#imports
@@ -732,6 +816,7 @@ by Albert Robida, ca 1902
 [opera01]: images/hypermodern-python-01/opera_crop01.jpg
 [opera02]: images/hypermodern-python-01/opera_crop02.jpg
 [opera03]: images/hypermodern-python-01/opera_crop03.jpg
+[opera04]: images/hypermodern-python-01/opera_crop04.jpg
 [opera05]: images/hypermodern-python-01/opera_crop05.jpg
 [opera06]: images/hypermodern-python-01/opera_crop06.jpg
 [opera07]: images/hypermodern-python-01/opera_crop07.jpg
@@ -762,4 +847,3 @@ by Albert Robida, ca 1902
 [virtual environment]: https://docs.python.org/3/tutorial/venv.html
 [wheel]: https://www.python.org/dev/peps/pep-0427/ 
 [xkcd1987]: https://xkcd.com/1987/
-
