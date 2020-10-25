@@ -108,9 +108,10 @@ using one of the commands listed in the [official instructions][pyenv-wiki].
 For example, on a recent [Ubuntu] this would be:
 
 ```sh
-sudo apt update && sudo apt install -y build-essential libssl-dev zlib1g-dev \
-libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev \
-libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
+sudo apt-get update; sudo apt-get install --no-install-recommends make \
+build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev \
+wget curl llvm libncurses5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev \
+libffi-dev liblzma-dev
 ```
 
 You're ready to install the latest Python releases. This may take a while:
@@ -652,7 +653,7 @@ by Albert Robida, ca 1902
 [poetry install]: https://python-poetry.org/docs/cli/#install
 [poetry run]: https://python-poetry.org/docs/cli/#run
 [poetry update]: https://python-poetry.org/docs/cli/#update
-[pyenv-wiki]: https://github.com/pyenv/pyenv/wiki/Common-build-problems
+[pyenv-wiki]: https://github.com/pyenv/pyenv/wiki
 [pyenv]: https://github.com/pyenv/pyenv
 [pyflow]: https://github.com/David-OConnor/pyflow
 [pyproject.toml]: https://python-poetry.org/docs/pyproject/
