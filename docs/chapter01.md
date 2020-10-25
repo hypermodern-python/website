@@ -13,7 +13,7 @@ Throughout this guide, replace `hypermodern-python` with the name of your own re
 Choosing a different name avoids a name collision on [PyPI].
 ```
 
-## Setting up a GitHub repository
+## Creating a repository on GitHub
 
 ![opera02]
 
@@ -146,8 +146,21 @@ versions are accessible as `python3.8` and `python3.9`, respectively.
 
 [Poetry] is a Python packaging and dependencies manager,
 similar in spirit to JavaScript's `npm` and Rust's `cargo`.
-Common alternatives are [pipenv], [flit], and [setuptools] with [pip-tools].
-<!-- Less common ones are [hatch], [pyflow], and [dephell]. -->
+Common alternatives are [pipenv], [setuptools] with [pip-tools], and [flit].
+
+<!-- 
+[dephell]: https://dephell.org/
+[enscons]: https://github.com/dholth/enscons
+[hatch]: https://github.com/ofek/hatch
+[pbr]: https://docs.openstack.org/pbr/latest/
+[pdm]: https://pdm.fming.dev/
+[pyflow]: https://github.com/David-OConnor/pyflow
+[pymsbuild]: https://github.com/zooba/pymsbuild
+
+The Big List of Python Packaging and Distribution Tools:
+
+[cs01-python-packaging]: https://grassfedcode.com/python-packaging/
+-->
 
 Install Poetry by downloading and running [get-poetry.py]:
 
@@ -256,7 +269,7 @@ This ensures that the package name is a valid Python identifier,
 unlike the repository name `hypermodern-python`.
 These naming conventions are also known as [snake case] and [kebab case].
 
-## Managing virtual environments with Poetry
+## Managing environments with Poetry
 
 ![opera07]
 
@@ -479,7 +492,7 @@ but sometimes it's nice to be able to specify
 Besides, this technique does not require an entry-point script at all.
 ```
 
-## Example: Consuming a REST API with httpx
+## Example: Consuming an API with httpx
 
 ![opera10]
 
@@ -595,6 +608,84 @@ Here are some things you might want to try:
 - Add an option to select the Wikipedia edition for another language.
 - If you feel adventurous: auto-detect the user's preferred language edition, using [locale].
 
+## Uploading your package to PyPI
+
+![opera01]
+
+The [Python Package Index][PyPI] (PyPI) is Python's official package registry,
+also known by its affectionate nickname "[the Cheese Shop][Cheese Shop sketch]".
+Uploading your package to PyPI allows others to install it with [pip], like so:
+
+```sh
+pip install hypermodern-python
+```
+
+```{tip}
+The next section shows another method for installing Python applications from PyPI,
+which avoids some of the pitfalls associated with the command above.
+```
+
+Create an account on [PyPI] using *Register* in the top menu,
+and enable two-factor authentication for an additional layer of security.
+
+Before you can upload your Python package, you need to generate *distribution packages*.
+These are compressed archives which an end-user can download and install on their system.
+They come in two flavours: source (or *sdist*) archives, and binary packages in the [wheel] format.
+Poetry supports generating both with the [poetry build] command:
+
+```sh
+$ poetry build
+
+Building hypermodern-python (0.1.0)
+ - Building sdist
+ - Built hypermodern-python-0.1.0.tar.gz
+
+ - Building wheel
+ - Built hypermodern_python-0.1.0-py3-none-any.whl
+```
+
+Poetry also supports uploading your package to PyPI, with the [poetry publish] command:
+
+```sh
+$ poetry publish
+
+Publishing hypermodern-python (0.1.0) to PyPI
+Username: <your-username>
+Password:
+ - Uploading hypermodern-python-0.1.0.tar.gz 100%
+ - Uploading hypermodern_python-0.1.0-py3-none-any.whl 100%
+```
+
+In the last chapter of this guide, we are going to automate the PyPI release process.
+Automation helps you ensure your Python package passes all checks before it is published,
+and keeps the build and upload process itself reliable.
+
+## Installing applications with pipx
+
+While [pip] is the workhorse of the Python packaging ecosystem,
+you should use higher-level tools to install your package:
+
+- If the package is an application, install it with [pipx] (see below).
+- If the package is a library, install it with [poetry add] in other Poetry-managed projects.
+
+```{tip}
+If the other project is not managed by Poetry,
+use whatever method the other project uses.
+Once your package is on PyPI, it is no longer tied to a specific tool like Poetry.
+You can add your package to a [requirements.txt] or [Pipfile][pipenv],
+or install your project into a virtual environment with plain [pip].
+```
+
+The primary benefit of these installation methods is that
+your package is installed into an isolated environment,
+without polluting the system environment, or the environments of other applications.
+This way, applications can use specific versions of their direct and indirect dependencies,
+without getting in each other's way.
+
+Install [pipx] using pip.
+
+## Summary
+
 ```{admonition} Credits
 :class: seealso
 
@@ -607,6 +698,7 @@ by Albert Robida, ca 1902
 
 [Albert Robida]: http://www.loc.gov/pictures/item/2007676247/
 [BitBucket]: https://bitbucket.org/
+[Cheese Shop sketch]: https://en.wikipedia.org/wiki/Cheese_Shop_sketch
 [Debian]: https://www.debian.org/
 [Fedora]: https://developer.fedoraproject.org/tech/languages/python/multiple-pythons.html
 [GitHub]: https://github.com
@@ -624,21 +716,20 @@ by Albert Robida, ca 1902
 [Python package]: https://docs.python.org/3/tutorial/modules.html#packages
 [REST API]: https://restfulapi.net/
 [Semantic Versioning]: https://semver.org/
-[TOML]: https://github.com/toml-lang/toml
+[TOML]: https://toml.io/
 [Ubuntu]: https://ubuntu.com/
 [Wikipedia API]: https://www.mediawiki.org/wiki/REST_API
 [Windows Subsystem for Linux]: https://docs.microsoft.com/en-us/windows/wsl/install-win10
 [click]: https://click.palletsprojects.com/
 [deadsnakes PPA]: https://launchpad.net/~deadsnakes/+archive/ubuntu/ppa
-[dephell]: https://dephell.org/
 [dev-prod-parity]: https://12factor.net/dev-prod-parity
 [flit]: https://github.com/takluyver/flit
 [get-poetry.py]: https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py
 [git-best-practices]: https://deepsource.io/blog/git-best-practices/
-[hatch]: https://github.com/ofek/hatch
 [httpx]: https://www.python-httpx.org/
 [kebab case]: https://en.wiktionary.org/wiki/Kebab_case
 [locale]: https://docs.python.org/3.8/library/locale.html
+[opera01]: images/hypermodern-python-01/opera_crop01.jpg
 [opera02]: images/hypermodern-python-01/opera_crop02.jpg
 [opera03]: images/hypermodern-python-01/opera_crop03.jpg
 [opera05]: images/hypermodern-python-01/opera_crop05.jpg
@@ -648,21 +739,27 @@ by Albert Robida, ca 1902
 [opera09]: images/hypermodern-python-01/opera_crop09.jpg
 [opera10]: images/hypermodern-python-01/opera_crop10.jpg
 [pip-tools]: https://github.com/jazzband/pip-tools
-[pipenv]: https://pipenv.pypa.io/en/latest/
+[pip]: https://pip.pypa.io/
+[pipenv]: https://pipenv.pypa.io/
+[pipx]: https://pipxproject.github.io/pipx/
 [poetry add]: https://python-poetry.org/docs/cli/#add
+[poetry build]: https://python-poetry.org/docs/cli/#build
 [poetry install]: https://python-poetry.org/docs/cli/#install
+[poetry publish]: https://python-poetry.org/docs/cli/#publish
 [poetry run]: https://python-poetry.org/docs/cli/#run
 [poetry update]: https://python-poetry.org/docs/cli/#update
 [pyenv-wiki]: https://github.com/pyenv/pyenv/wiki
 [pyenv]: https://github.com/pyenv/pyenv
-[pyflow]: https://github.com/David-OConnor/pyflow
 [pyproject.toml]: https://python-poetry.org/docs/pyproject/
 [python.org]: https://www.python.org/downloads/
 [requests]: https://requests.readthedocs.io/
+[requirements.txt]: https://pip.pypa.io/en/stable/user_guide/#requirements-files
 [setuptools]: http://setuptools.readthedocs.io
 [snake case]: https://en.wikipedia.org/wiki/Snake_case
 [src layout]: https://hynek.me/articles/testing-packaging/
 [textwrap]: https://docs.python.org/3/library/textwrap.html
 [version constraint]: https://python-poetry.org/docs/versions/
 [virtual environment]: https://docs.python.org/3/tutorial/venv.html
+[wheel]: https://www.python.org/dev/peps/pep-0427/ 
 [xkcd1987]: https://xkcd.com/1987/
+
