@@ -37,7 +37,7 @@ and they come in two types:
 
 - *Development dependencies* are only required by developers working on your code.
   Examples are applications used to run tests,
-  check code for style and correctness,
+  to check code for style and correctness,
   or to build documentation.
   These dependencies are not a part of distribution packages,
   because users do not require them to run your code.
@@ -67,6 +67,7 @@ which checks whether the program exits with a status code of zero.
 ```{code-block} python
 ---
 caption: tests/test_main.py
+linenos: true
 ---
 
 import click.testing
@@ -90,6 +91,8 @@ When the test case is run, the parameter receives the return value of the fixtur
 ```{code-block} python
 ---
 caption: tests/test_main.py
+linenos: true
+emphasize-lines: 6-8
 ---
 
 import click.testing
@@ -230,6 +233,23 @@ Statement coverage will only see that all lines of code were executed.
 But skipping the body could conceivably break code after the `if` block.
 This specific code path is never executed by the test suite.
 Branch coverage alerts us to this situation.
+```
+
+Why is the `if` clause missing from coverage then?
+The module name is only `__main__` when our package is invoked as `python -m hypermodern_python`.
+The test suite imports the package normally,
+so it is to be expected that it would be missing from coverage.
+
+Exclude the lines from coverage using a special marker comment:
+
+```{code-block} python
+---
+lineno-start: 24
+---
+
+
+if __name__ == "__main__":  # pragma: no cover
+    main()
 ```
 
 ---
