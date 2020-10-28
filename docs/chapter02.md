@@ -25,6 +25,24 @@ using [poetry add] with the `--dev` option:
 poetry add --dev pytest
 ```
 
+```{note}
+Dependencies are Python packages used by your project,
+and they come in two types:
+
+- *Core dependencies* are required by users running your code,
+  and typically consist of third-party libraries imported by your package.
+  When your package is distributed,
+  the package metadata includes these dependencies,
+  allowing tools like pip to automatically install them alongside your package.
+
+- *Development dependencies* are only required by developers working on your code.
+  Examples are applications used to run tests,
+  check code for style and correctness,
+  or to build documentation.
+  These dependencies are not a part of distribution packages,
+  because users do not require them to run your code.
+```
+
 Organize tests in a [separate file hierarchy][pytest-good-practices] next to `src`, named `tests`:
 
 ```sh
@@ -46,8 +64,11 @@ Furthermore, it gives you the option to import modules from within your tests pa
 The file `test_main.py` contains a test case for the `__main__` module,
 which checks whether the program exits with a status code of zero.
 
-```python
-# tests/test_main.py
+```{code-block} python
+---
+caption: tests/test_main.py
+---
+
 import click.testing
 
 from hypermodern_python import __main__
@@ -66,8 +87,11 @@ let's turn it into a *fixture*.
 Test cases can use a test fixture by including a function parameter with the same name as the fixture.
 When the test case is run, the parameter receives the return value of the fixture function.
 
-```python
-# tests/test_main.py
+```{code-block} python
+---
+caption: tests/test_main.py
+---
+
 import click.testing
 import pytest
 
@@ -96,6 +120,182 @@ tests/test_main.py .                                          [100%]
 ========================= 1 passed in 1.20s =========================
 ```
 
+## Code coverage with Coverage.py
+
+![verne03]
+
+*Code coverage* is a measure of the degree to which
+the source code of your program is executed while running its test suite.
+The code coverage of Python programs can be determined using a tool called [Coverage.py].
+Install it as a development dependency using Poetry:
+
+```sh
+poetry add --dev 'coverage[toml]'
+```
+
+<!--
+```{note}
+Quotes are optional unless your shell is [zsh],
+which assigns special meaning to square brackets.
+```
+-->
+
+The `[toml]` [extra][core-metadata-provides-extra] allows
+Coverage.py to read its configuration from `pyproject.toml`.
+Let's add the following contents to this file:
+
+```{code-block} toml
+---
+caption: pyproject.toml
+---
+
+[tool.coverage.run]
+source = ["hypermodern_python", "tests"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+```
+
+We have added three configuration options for Coverage.py:
+
+- The `tool.coverage.run.source` option specifies for which packages to collect coverage data.
+  List the name of your package,
+  [as well as the test suite][ned-batchelder-blog-include-your-tests] itself.
+
+- The `tool.coverage.run.branch` option activates branch coverage.
+  While statement coverage flags lines of code that are not executed,
+  branch coverage allows you to identify uncovered branches in conditional code,
+  such as `if...else` constructs.
+
+- The `tool.coverage.report.show_missing` option enables the display of line numbers for missing coverage.
+
+Coverage.py comes with a command-line interface named `coverage`, sporting a number of subcommands.
+In the simplest case, checking test coverage is a two-step process:
+
+- `coverage run` executes a script or module (via the `-m` option) and collects coverage data.
+- `coverage report` prints a textual summary of the coverage data.
+
+```{note}
+The form `coverage run -m pytest` is a convenient way to
+use the pytest package from the active environment.
+```
+
+Let's try this with our test suite:
+
+```pytest
+$ poetry run coverage run -m pytest
+
+============================ test session starts =============================
+platform linux -- Python 3.9.0, pytest-6.1.1, py-1.9.0, pluggy-0.13.1
+rootdir: /root/hypermodern-python
+collected 1 item
+
+tests/test_main.py .                                                   [100%]
+
+============================= 1 passed in 0.74s ==============================
+
+$ poetry run coverage report
+
+Name                                 Stmts   Miss Branch BrPart  Cover   Missing
+--------------------------------------------------------------------------------
+src/hypermodern_python/__init__.py       0      0      0      0   100%
+src/hypermodern_python/__main__.py      16      1      2      1    89%   25->26, 26
+tests/__init__.py                        0      0      0      0   100%
+tests/test_main.py                       9      0      0      0   100%
+--------------------------------------------------------------------------------
+TOTAL                                   25      1      2      1    93%
+```
+
+The coverage report shows missing coverage at the end of the `__main__.py` module:
+
+```{code-block} python
+---
+lineno-start: 24
+---
+
+
+if __name__ == "__main__":
+    main()
+```
+
+Let's inspect the `Missing` column more closely.
+`26` tells us that line `26` was never executed.
+`25->26` relates to branch coverage, and tells us that the condition on line `25` never evaluated to `True`.
+
+```{note}
+Branch coverage may seem redundant here, but consider the opposite case:
+If the condition always evaluates to `True`, the body of the `if` statement is never skipped.
+Statement coverage will only see that all lines of code were executed.
+But skipping the body could conceivably break code after the `if` block.
+This specific code path is never executed by the test suite.
+Branch coverage alerts us to this situation.
+```
+
+---
+
+```toml
+# pyproject.toml
+[tool.coverage.run]
+parallel = true
+```
+
+```toml
+# pyproject.toml
+[tool.coverage.paths]
+source = ["src", "*/site-packages"]
+```
+
+Entries under `tool.coverage.paths` list paths that are considered equivalent.
+An important use of this option is to map paths to installed modules back to their source code.
+The first value in an entry is the location of the source code
+(the `src` directory in your project).
+The second value is a file pattern to match against paths of collected data.
+Python packages are installed into a directory named `site-packages`,
+so we can use this name in a wildcard pattern.
+
+To enable coverage reporting, invoke `pytest` with the `--cov` option:
+
+```pytest
+$ poetry run pytest --cov
+============================= test session starts ==============================
+platform linux -- Python 3.8.2, pytest-5.3.4, py-1.8.1, pluggy-0.13.1
+rootdir: /hypermodern-python
+plugins: cov-2.8.1
+collected 1 item
+
+tests/test_console.py .                                                 [100%]
+
+--------------- coverage: platform linux, python 3.8.2-final-0 -----------------
+Name                                 Stmts   Miss Branch BrPart  Cover   Missing
+--------------------------------------------------------------------------------
+src/hypermodern_python/__init__.py       1      0      0      0   100%
+src/hypermodern_python/console.py        6      0      0      0   100%
+--------------------------------------------------------------------------------
+TOTAL                                    7      0      0      0   100%
+============================== 1 passed in 0.09s ===============================
+```
+
+The reported code coverage is 100%.
+This number does not imply that your test suite has meaningful test cases for all uses and misuses of your program.
+Code coverage only tells you that all lines and branches in your code base were hit.
+(In fact, our test case achieved full coverage
+without checking the functionality of the program at all,
+only its exit status.)
+
+Nevertheless, aiming for 100% code coverage is good practice, especially for a fresh codebase.
+Anything less than that implies that some part of your code base is definitely untested.
+And to quote [Bruce Eckel], "If it's not tested, it's broken."
+Later, we will see some tools that help you achieve extensive code coverage.
+
+You can configure Coverage.py to require full test coverage (or any other target percentage) using the [fail_under] option:
+
+```toml
+# pyproject.toml
+[tool.coverage.report]
+fail_under = 100
+```
+
 ## Test automation with Nox
 
 ![verne04]
@@ -117,6 +317,16 @@ Install Nox via [pipx]:
 
 ```sh
 pipx install nox
+```
+
+```{note}
+Do not install Nox as a development dependency with Poetry.
+Nox is a part of your global developer environment, like Poetry, pyenv, and pipx.
+All of these tools are in a sense environment managers.
+It's better to decouple them than to
+enter a complex situation where environments are spawned from other environments.
+To quote the [Zen of Python][PEP 20],
+"Flat is better than nested."
 ```
 
 Create a `noxfile.py` with the following contents:
@@ -205,85 +415,17 @@ def tests(session):
     session.run("pytest", *session.posargs)
 ```
 
-This is especially useful to select specific test cases.
+This is especially useful to pass specific test modules or test functions:
+
+```sh
+nox --session=tests -- tests/test_main.py
+nox --session=tests -- -k test_main_succeeds
+```
+
 Another example would be to increase pytest's verbosity:
 
 ```sh
-nox --session=tests --python=3.9 -- --verbose
-```
-
-## Code coverage with Coverage.py
-
-![verne03]
-
-*Code coverage* is a measure of the degree to which
-the source code of your program is executed while running its test suite.
-The code coverage of Python programs can be determined using a tool called [Coverage.py].
-Install it with the [pytest-cov] plugin,
-which integrates Coverage.py with `pytest`:
-
-```sh
-poetry add --dev coverage[toml] pytest-cov
-```
-
-You can configure Coverage.py using the `pyproject.toml` configuration file,
-provided it was installed with the `toml` extra as shown above.
-Update this file to inform the tool about your package name and source tree layout.
-The configuration also enables branch analysis and the display of line numbers for missing coverage:
-
-```toml
-# pyproject.toml
-[tool.coverage.paths]
-source = ["src", "*/site-packages"]
-
-[tool.coverage.run]
-branch = true
-source = ["hypermodern_python"]
-
-[tool.coverage.report]
-show_missing = true
-```
-
-To enable coverage reporting, invoke `pytest` with the `--cov` option:
-
-```pytest
-$ poetry run pytest --cov
-============================= test session starts ==============================
-platform linux -- Python 3.8.2, pytest-5.3.4, py-1.8.1, pluggy-0.13.1
-rootdir: /hypermodern-python
-plugins: cov-2.8.1
-collected 1 item
-
-tests/test_console.py .                                                 [100%]
-
---------------- coverage: platform linux, python 3.8.2-final-0 -----------------
-Name                                 Stmts   Miss Branch BrPart  Cover   Missing
---------------------------------------------------------------------------------
-src/hypermodern_python/__init__.py       1      0      0      0   100%
-src/hypermodern_python/console.py        6      0      0      0   100%
---------------------------------------------------------------------------------
-TOTAL                                    7      0      0      0   100%
-============================== 1 passed in 0.09s ===============================
-```
-
-The reported code coverage is 100%.
-This number does not imply that your test suite has meaningful test cases for all uses and misuses of your program.
-Code coverage only tells you that all lines and branches in your code base were hit.
-(In fact, our test case achieved full coverage
-without checking the functionality of the program at all,
-only its exit status.)
-
-Nevertheless, aiming for 100% code coverage is good practice, especially for a fresh codebase.
-Anything less than that implies that some part of your code base is definitely untested.
-And to quote [Bruce Eckel], "If it's not tested, it's broken."
-Later, we will see some tools that help you achieve extensive code coverage.
-
-You can configure Coverage.py to require full test coverage (or any other target percentage) using the [fail_under] option:
-
-```toml
-# pyproject.toml
-[tool.coverage.report]
-fail_under = 100
+nox --session=tests -- --verbose
 ```
 
 ## Mocking with pytest-mock
@@ -829,15 +971,18 @@ by Jules Verne (1870)
 [Internet Archive]: https://archive.org/details/delaterrelalu00vern
 [Lojban Wikipedia]: https://xkcd.com/191/
 [Nox]: https://nox.thea.codes/
+[PEP 20]: https://www.python.org/dev/peps/pep-0020
 [The Public Domain Review]: https://publicdomainreview.org/collection/emile-antoine-bayard-s-illustrations-for-around-the-moon-by-jules-verne-1870
 [assert_called_with]: https://docs.python.org/3/library/unittest.mock.html#unittest.mock.Mock.assert_called_with
 [call_args]: https://docs.python.org/3/library/unittest.mock.html#unittest.mock.Mock.call_args
 [called]: https://docs.python.org/3/library/unittest.mock.html#unittest.mock.Mock.called
 [click.option]: https://click.palletsprojects.com/en/7.x/options/
 [context manager]: https://docs.python.org/3/reference/datamodel.html#context-managers
+[core-metadata-provides-extra]: https://packaging.python.org/specifications/core-metadata/#provides-extra-multiple-use
 [factoryboy]: https://factoryboy.readthedocs.io/
 [fail_under]: https://coverage.readthedocs.io/en/stable/config.html#report
 [generator]: https://docs.python.org/3/tutorial/classes.html#generators
+[ned-batchelder-blog-include-your-tests]: https://nedbatchelder.com/blog/202008/you_should_include_your_tests_in_coverage.html
 [nox-reuse-existing-virtualenvs]: https://nox.thea.codes/en/stable/usage.html#re-using-virtualenvs
 [pip]: https://pip.pypa.io/en/stable/
 [pipx]: https://pipxproject.github.io/pipx/
@@ -871,3 +1016,5 @@ by Jules Verne (1870)
 [verne10]: images/hypermodern-python-02/verne10.jpg
 [wikipedia-language-editions]: https://en.wikipedia.org/wiki/List_of_Wikipedias
 [writing a failing test]: https://www.icemobile.com/uploads/inline/test.driven.development.cartoon_0.jpeg
+[zsh]: https://www.zsh.org/
+
