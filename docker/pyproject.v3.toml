@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "hypermodern-python"
+version = "0.1.0"
+description = "The hypermodern Python project"
+authors = ["Your Name <you@example.com>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/user/repo"
+repository = "https://github.com/user/repo"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+click = "^7.1.2"
+httpx = "^0.16.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.1.2"
+coverage = {extras = ["toml"], version = "^5.3"}
+
+[tool.poetry.scripts]
+hypermodern-python = "hypermodern_python.__main__:main"
+
+[tool.coverage.run]
+source = ["hypermodern_python", "tests"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

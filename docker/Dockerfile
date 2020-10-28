@@ -54,3 +54,14 @@ COPY pyproject.v2.toml pyproject.toml
 COPY __main__.v2.py src/$PACKAGE/__main__.py
 RUN poetry install
 RUN pipx install .
+# Chapter 02
+RUN poetry add --dev pytest
+RUN mkdir tests
+RUN touch tests/__init__.py
+COPY test_main.py tests/
+RUN poetry run pytest
+RUN poetry add --dev 'coverage[toml]'
+COPY pyproject.v3.toml pyproject.toml
+RUN poetry run coverage run -m pytest
+RUN poetry run coverage report
+RUN sed -i '/^if/s/$/  # pragma: no cover/' src/$PACKAGE/__main__.py
