@@ -8,6 +8,11 @@ that uses the Wikipedia API to display random facts on the console.
 - [View changes](https://github.com/cjolowicz/hypermodern-python/compare/initial...chapter01)
 - [Download code](https://github.com/cjolowicz/hypermodern-python/archive/chapter01.zip)
 
+```{tip}
+This guide has a companion repository: [cjolowicz/hypermodern-python].
+Each article in the guide corresponds to a set of commits in the GitHub repository.
+```
+
 ```{important}
 Throughout this guide, replace `hypermodern-python` with the name of your own repository.
 Choosing a different name avoids a name collision on [PyPI].
@@ -184,8 +189,12 @@ This command will create a `pyproject.toml` file,
 containing the package configuration in [TOML] format:
 
 
-```toml
-# pyproject.toml
+```{code-block} toml
+---
+caption: pyproject.toml
+linenos: true
+---
+
 [tool.poetry]
 name = "hypermodern-python"
 version = "0.1.0"
@@ -220,7 +229,11 @@ Poetry added a dependency on Python 3.9,
 because this is the Python version you ran it in.
 Support the previous release as well by changing it to Python 3.8:
 
-```toml
+```{code-block} toml
+---
+lineno-start: 7
+---
+
 [tool.poetry.dependencies]
 python = "^3.8"
 ```
@@ -231,11 +244,16 @@ but giving no guarantees for its use with a future [Python 4.0].
 
 Let's also update the metadata for the package:
 
-```toml
-# pyproject.toml
+```{code-block} toml
+---
+lineno-start: 1
+---
+
 [tool.poetry]
-...
+name = "hypermodern-python"
+version = "0.1.0"
 description = "The hypermodern Python project"
+authors = ["Your Name <you@example.com>"]
 license = "MIT"
 readme = "README.md"
 homepage = "https://github.com/<username>/<repository>"
@@ -382,8 +400,12 @@ Time to add some actual code to the package.
 As you may have guessed, we're going to create a console application using `click`.
 Create a file named `__main__.py` next to `__init__.py` with the following contents:
 
-```python
-# src/hypermodern_python/__main__.py
+```{code-block} python
+---
+caption: src/hypermodern_python/\_\_main\_\_.py
+linenos: true
+---
+
 import click
 
 @click.command()
@@ -397,7 +419,12 @@ This module defines a minimal command-line application, supporting `--help` and 
 
 Register the script in `pyproject.toml`:
 
-```toml
+```{code-block} toml
+---
+caption: pyproject.toml
+lineno-start: 16
+---
+
 [tool.poetry.scripts]
 hypermodern-python = "hypermodern_python.__main__:main"
 ```
@@ -448,14 +475,26 @@ $ poetry run hypermodern-python --version
 hypermodern-python, version 0.1.0
 ```
 
-Using the name `__main__.py` for the entry point is not a mere convention.
-If you invoke python with the option `-m` followed by the name of your package,
-it will execute this module.
+Using the name `__main__.py` for this module is not a mere convention.
+If you invoke Python with the option `-m` followed by the name of your package,
+it executes this module, and sets its name to `__main__`.
+
+```{tip}
+Isn't this module always named `__main__`?
+Actually, no.
+When imported normally, the module name is `hypermodern_python.__main__`,
+prefixed by the package name.
+```
+
 To leverage this, add two lines to the bottom of the module,
 to invoke `main` when the module is run as a script:
 
-```python
-# src/hypermodern_python/__main__.py
+```{code-block} python
+---
+caption: src/hypermodern_python/\_\_main\_\_.py
+linenos: true
+---
+
 import click
 
 @click.command()
@@ -468,13 +507,13 @@ if __name__ == "__main__":
     main(prog_name="hypermodern-python")
 ```
 
-```{tip}
 Pass the program name explicitly in the `prog_name` parameter.
-Otherwise, the command will be displayed as `__main__` in the usage message.
+This ensures that it is displayed properly in the `--help` output.
 
-Do you find this confusing?
-The parameter does not exist in your `main` function,
-but the `@click.command` decorator turns your function into a `click.Command` object.
+```{tip}
+Do you find it confusing where the `prog_name` parameter comes from?
+The parameter was not declared in our `main` function,
+but the `@click.command` decorator turns that function into a `click.Command` object.
 This object is callable and accepts some common keyword-arguments,
 including `prog_name`.
 ```
@@ -487,13 +526,11 @@ $ poetry run python -m hypermodern_python
 Hello, world!
 ```
 
-```{note}
-Don't worry if you don't see why people would want to do this.
-It may be more to type,
-but sometimes it's nice to be able to specify
-[exactly which Python][xkcd1987] you want to run an application with.
-Besides, this technique does not require an entry-point script at all.
-```
+Invoking a script using Python's `-m` option can be advantageous in some situations:
+
+- The script can be located using the Python module namespace rather than the filesystem.
+- You don't require an entry-point script at all.
+- You can specify [exactly which Python][xkcd1987] you want to run the application with.
 
 ## Example: Consuming an API with httpx
 
@@ -514,8 +551,12 @@ If you are familiar with [requests], httpx uses a very similar API.
 
 Next, replace the file `src/hypermodern-python/__main__.py` with the source code shown below.
 
-```python
-# src/hypermodern_python/__main__.py
+```{code-block} python
+---
+caption: src/hypermodern_python/\_\_main\_\_.py
+linenos: true
+---
+
 import textwrap
 
 import click
@@ -543,7 +584,11 @@ if __name__ == "__main__":
 
 Let's take a look at the imports at the top of the module first:
 
-```python
+```{code-block} python
+---
+lineno-start: 1
+---
+
 import textwrap
 
 import click
@@ -559,7 +604,11 @@ The `API_URL` constant points to the [REST API] of the English Wikipedia,
 or more specifically, its `/page/random/summary` endpoint,
 which returns the summary of a random Wikipedia article:
 
-```python
+```{code-block} python
+---
+lineno-start: 6
+---
+
 API_URL = "https://en.wikipedia.org/api/rest_v1/page/random/summary"
 ```
 
@@ -569,27 +618,39 @@ Before looking at the response body, we check the HTTP status code and raise an 
 The response body contains the resource data in [JSON] format,
 which can be accessed using the `response.json()` method.
 
-```python
-response = httpx.get(API_URL)
-response.raise_for_status()
-data = response.json()
+```{code-block} python
+---
+lineno-start: 12
+---
+
+    response = httpx.get(API_URL)
+    response.raise_for_status()
+    data = response.json()
 ```
 
 We are only interested in the `title` and `extract` attributes,
 containing the title of the Wikipedia page and a short plain text extract, respectively:
 
-```python
-title = data["title"]
-extract = data["extract"]
+```{code-block} python
+---
+lineno-start: 16
+---
+
+    title = data["title"]
+    extract = data["extract"]
 ```
 
 Finally, we print the title and extract to the console, using the `click.echo` and `click.secho` functions.
 The latter function allows you to specify the foreground color using the `fg` keyword attribute.
 The `textwrap.fill` function wraps the text in `extract` so that every line is at most 70 characters long.
 
-```python
-click.secho(title, fg="green")
-click.echo(textwrap.fill(extract))
+```{code-block} python
+---
+lineno-start: 19
+---
+
+    click.secho(title, fg="green")
+    click.echo(textwrap.fill(extract))
 ```
 
 Let's try it out!
@@ -627,8 +688,8 @@ pip install hypermodern-python
 See the next section to avoid some pitfalls when using pip.
 ```
 
-Create an account on [PyPI] using *Register* in the top menu,
-and enable two-factor authentication for an additional layer of security.
+Create an account on [PyPI] using *Register* in the top menu.
+Enable two-factor authentication for an additional layer of security.
 
 Before you can upload your Python package, you need to generate *distribution packages*.
 These are compressed archives which an end-user can download and install on their system.
@@ -804,6 +865,7 @@ by Albert Robida, ca 1902
 [Ubuntu]: https://ubuntu.com/
 [Wikipedia API]: https://www.mediawiki.org/wiki/REST_API
 [Windows Subsystem for Linux]: https://docs.microsoft.com/en-us/windows/wsl/install-win10
+[cjolowicz/hypermodern-python]: https://github.com/cjolowicz/hypermodern-python
 [click]: https://click.palletsprojects.com/
 [deadsnakes PPA]: https://launchpad.net/~deadsnakes/+archive/ubuntu/ppa
 [dev-prod-parity]: https://12factor.net/dev-prod-parity
