@@ -422,7 +422,7 @@ Register the script in `pyproject.toml`:
 ```{code-block} toml
 ---
 caption: pyproject.toml
-lineno-start: 16
+lineno-start: 17
 ---
 
 [tool.poetry.scripts]
