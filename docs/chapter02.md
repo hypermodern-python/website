@@ -401,18 +401,13 @@ if __name__ == "__main__":  # pragma: no cover
 ```
 
 The reported code coverage is now at 100%.
-This number does not imply that your test suite has meaningful test cases for all uses and misuses of your program.
-Code coverage only tells you that all lines and branches in your code base were hit.
-(In fact, our test case achieved full coverage
-without checking the functionality of the program at all,
-only its exit status.)
-
-Nevertheless, aiming for 100% code coverage is good practice, especially for a fresh codebase.
+Aiming for full code coverage is generally a good idea, especially for a fresh code base.
 Anything less than that implies that some part of your code base is definitely untested.
 And to quote [Bruce Eckel], "If it's not tested, it's broken."
 Later, we will see some tools that help you achieve extensive code coverage.
 
-Configure Coverage.py to require full test coverage (or any other target percentage) using the [fail_under] option:
+Configure Coverage.py to require full test coverage (or any other target percentage)
+using the option `tool.coverage.report.fail_under`:
 
 ```{code-block} toml
 ---
@@ -424,6 +419,14 @@ emphasize-lines: "3"
 [tool.coverage.report]
 show_missing = true
 fail_under = 100
+```
+
+```{important}
+Code coverage tells you that all lines and branches in your code base were hit.
+This does not imply that your test suite has meaningful test cases for all uses and misuses of your program.
+Take our test case, for example:
+It did not check the functionality of the program at all, only its exit status;
+yet it achieved full coverage.
 ```
 
 ## Automated coverage with Nox
