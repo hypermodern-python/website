@@ -1,0 +1,10 @@
+--- a/pyproject.toml	2020-10-29 23:30:28.000000000 +0100
++++ b/pyproject.toml	2020-10-29 23:30:22.000000000 +0100
+@@ -22,6 +22,7 @@
+ 
+ [tool.coverage.report]
+ show_missing = true
++fail_under = 100
+ 
+ [build-system]
+ requires = ["poetry-core>=1.0.0"]

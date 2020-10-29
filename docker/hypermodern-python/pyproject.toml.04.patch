@@ -1,0 +1,16 @@
+--- pyproject.toml	2020-10-29 13:50:01.000000000 +0100
++++ pyproject.toml	2020-10-29 21:54:48.000000000 +0100
+@@ -16,6 +16,13 @@
+ [tool.poetry.scripts]
+ hypermodern-python = "hypermodern_python.__main__:main"
+ 
++[tool.coverage.run]
++source = ["hypermodern_python", "tests"]
++branch = true
++
++[tool.coverage.report]
++show_missing = true
++
+ [build-system]
+ requires = ["poetry-core>=1.0.0"]
+ build-backend = "poetry.core.masonry.api"

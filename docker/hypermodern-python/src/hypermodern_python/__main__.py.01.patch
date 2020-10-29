@@ -1,0 +1,9 @@
+--- a/src/hypermodern_python/__main__.py	2020-10-29 13:48:25.000000000 +0100
++++ b/src/hypermodern_python/__main__.py	2020-10-29 13:52:48.000000000 +0100
+@@ -5,3 +5,6 @@
+ def main():
+     """The hypermodern Python project."""
+     click.echo("Hello, world!")
++
++if __name__ == "__main__":
++    main(prog_name="hypermodern-python")

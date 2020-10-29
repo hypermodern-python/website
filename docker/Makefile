@@ -1,7 +1,7 @@
 IMAGE = hypermodern-python.io
 
 run: image
-	docker run --rm -ti $(IMAGE)
+	docker run --rm --tty --interactive $(IMAGE)
 
 image:
-	docker build -t $(IMAGE) .
+	docker build --tag=$(IMAGE) --progress=plain .

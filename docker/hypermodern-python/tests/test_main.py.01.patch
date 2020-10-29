@@ -1,0 +1,17 @@
+--- a/tests/test_main.py	2020-10-29 21:42:58.000000000 +0100
++++ b/tests/test_main.py	2020-10-29 21:45:49.000000000 +0100
+@@ -1,8 +1,12 @@
+ import click.testing
++import pytest
+ 
+ from hypermodern_python import __main__
+ 
+-def test_main_succeeds():
+-    runner = click.testing.CliRunner()
++@pytest.fixture
++def runner():
++    return click.testing.CliRunner()
++
++def test_main_succeeds(runner):
+     result = runner.invoke(__main__.main)
+     assert result.exit_code == 0

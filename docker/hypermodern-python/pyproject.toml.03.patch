@@ -1,0 +1,12 @@
+--- a/pyproject.toml	2020-10-29 13:39:39.000000000 +0100
++++ b/pyproject.toml	2020-10-29 13:50:01.000000000 +0100
+@@ -13,6 +13,9 @@
+
+ [tool.poetry.dev-dependencies]
+
++[tool.poetry.scripts]
++hypermodern-python = "hypermodern_python.__main__:main"
++
+ [build-system]
+ requires = ["poetry-core>=1.0.0"]
+ build-backend = "poetry.core.masonry.api"

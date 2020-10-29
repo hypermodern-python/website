@@ -1,0 +1,16 @@
+--- a/pyproject.toml	2020-10-29 13:35:41.000000000 +0100
++++ b/pyproject.toml	2020-10-29 13:39:39.000000000 +0100
+@@ -1,8 +1,12 @@
+ [tool.poetry]
+ name = "hypermodern-python"
+ version = "0.1.0"
+-description = ""
++description = "The hypermodern Python project"
+ authors = ["Your Name <you@example.com>"]
++license = "MIT"
++readme = "README.md"
++homepage = "https://github.com/cjolowicz/hypermodern-python"
++repository = "https://github.com/cjolowicz/hypermodern-python"
+
+ [tool.poetry.dependencies]
+ python = "^3.8"

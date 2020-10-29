@@ -5,17 +5,13 @@ description = "The hypermodern Python project"
 authors = ["Your Name <you@example.com>"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/user/repo"
-repository = "https://github.com/user/repo"
+homepage = "https://github.com/cjolowicz/hypermodern-python"
+repository = "https://github.com/cjolowicz/hypermodern-python"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-click = "^7.1.2"
 
 [tool.poetry.dev-dependencies]
-
-[tool.poetry.scripts]
-hypermodern-python = "hypermodern_python.__main__:main"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
