@@ -158,8 +158,12 @@ To quote the [Zen of Python][PEP 20],
 
 Create a `noxfile.py` with the following contents:
 
-```python
-# noxfile.py
+```{code-block} python
+---
+caption: noxfile.py
+linenos: true
+---
+
 import nox
 
 @nox.session(python=["3.9", "3.8"])
@@ -232,8 +236,12 @@ Nox allows you to pass arbitrary options to a session after the `--` separator.
 These session options are available via the [session.posargs] variable.
 Let's modify the session to forward them to `pytest`:
 
-```python
-# noxfile.py
+```{code-block} python
+---
+caption: noxfile.py
+linenos: true
+---
+
 import nox
 
 @nox.session(python=["3.9", "3.8"])
@@ -370,14 +378,17 @@ This specific code path is never executed by the test suite.
 Branch coverage alerts us to this situation.
 ```
 
+<!--
 Exercising this code path from the test suite is not impossible
 (see [runpy] from the standard library for one approach).
-But such `if __name__ == "__main__"` blocks are both ubiquitous and trivial,
-so they are commonly [excluded from coverage][coverage-excluding-code] instead.
+-->
+
+`if __name__ == "__main__"` blocks are often [excluded from coverage][coverage-excluding-code]:
+They are trivial boilerplate, yet cumbersome to exercise from a test.
 Code can be excluded from Coverage.py via the configuration option `tool.coverage.report.exclude_lines`,
 which takes a list of regular expressions.
 Alternatively, you can apply a special marker comment to a line or block of code,
-which is the approach we will be taking here:
+which is the approach we'll take here:
 
 ```{code-block} python
 ---
@@ -387,6 +398,52 @@ lineno-start: 24
 
 if __name__ == "__main__":  # pragma: no cover
     main(prog_name="hypermodern_python")
+```
+
+The reported code coverage is now at 100%.
+This number does not imply that your test suite has meaningful test cases for all uses and misuses of your program.
+Code coverage only tells you that all lines and branches in your code base were hit.
+(In fact, our test case achieved full coverage
+without checking the functionality of the program at all,
+only its exit status.)
+
+Nevertheless, aiming for 100% code coverage is good practice, especially for a fresh codebase.
+Anything less than that implies that some part of your code base is definitely untested.
+And to quote [Bruce Eckel], "If it's not tested, it's broken."
+Later, we will see some tools that help you achieve extensive code coverage.
+
+Configure Coverage.py to require full test coverage (or any other target percentage) using the [fail_under] option:
+
+```{code-block} toml
+---
+caption: pyproject.toml
+lineno-start: 25
+emphasize-lines: "3"
+---
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 100
+```
+
+## Automated coverage with Nox
+
+![verne03]
+
+Let's adapt the Nox session to collect coverage data:
+
+```{code-block} python
+---
+caption: noxfile.py
+linenos: true
+---
+
+import nox
+
+@nox.session(python=["3.9", "3.8"])
+def tests(session):
+    session.install("pytest", ".")
+    session.run("coverage", "run", "-m", "pytest", *session.posargs)
 ```
 
 ---
@@ -435,26 +492,6 @@ src/hypermodern_python/console.py        6      0      0      0   100%
 --------------------------------------------------------------------------------
 TOTAL                                    7      0      0      0   100%
 ============================== 1 passed in 0.09s ===============================
-```
-
-The reported code coverage is 100%.
-This number does not imply that your test suite has meaningful test cases for all uses and misuses of your program.
-Code coverage only tells you that all lines and branches in your code base were hit.
-(In fact, our test case achieved full coverage
-without checking the functionality of the program at all,
-only its exit status.)
-
-Nevertheless, aiming for 100% code coverage is good practice, especially for a fresh codebase.
-Anything less than that implies that some part of your code base is definitely untested.
-And to quote [Bruce Eckel], "If it's not tested, it's broken."
-Later, we will see some tools that help you achieve extensive code coverage.
-
-You can configure Coverage.py to require full test coverage (or any other target percentage) using the [fail_under] option:
-
-```toml
-# pyproject.toml
-[tool.coverage.report]
-fail_under = 100
 ```
 
 ## Mocking with pytest-mock
