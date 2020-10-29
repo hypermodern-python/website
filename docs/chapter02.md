@@ -150,6 +150,7 @@ Let's add the following contents to this file:
 ```{code-block} toml
 ---
 caption: pyproject.toml
+lineno-start: 21
 ---
 
 [tool.coverage.run]
@@ -219,12 +220,14 @@ lineno-start: 24
 
 
 if __name__ == "__main__":
-    main()
+    main(prog_name="hypermodern_python")
 ```
 
 Let's inspect the `Missing` column more closely.
 `26` tells us that line `26` was never executed.
 `25->26` relates to branch coverage, and tells us that the condition on line `25` never evaluated to `True`.
+The `if` clause is missing from coverage because
+its condition only evaluates to `True` when the module is run as a script.
 
 ```{note}
 Branch coverage may seem redundant here, but consider the opposite case:
@@ -235,12 +238,14 @@ This specific code path is never executed by the test suite.
 Branch coverage alerts us to this situation.
 ```
 
-Why is the `if` clause missing from coverage then?
-The module name is only `__main__` when our package is invoked as `python -m hypermodern_python`.
-The test suite imports the package normally,
-so it is to be expected that it would be missing from coverage.
-
-Exclude the lines from coverage using a special marker comment:
+Exercising this code path from the test suite is not impossible
+(see [runpy] from the standard library for one approach).
+But such `if __name__ == "__main__"` blocks are both ubiquitous and trivial,
+so they are commonly [excluded from coverage][coverage-excluding-code] instead.
+Code can be excluded from Coverage.py via the configuration option `tool.coverage.report.exclude_lines`,
+which takes a list of regular expressions.
+Alternatively, you can apply a special marker comment to a line or block of code,
+which is the approach we will be taking here:
 
 ```{code-block} python
 ---
@@ -249,13 +254,17 @@ lineno-start: 24
 
 
 if __name__ == "__main__":  # pragma: no cover
-    main()
+    main(prog_name="hypermodern_python")
 ```
 
 ---
 
-```toml
-# pyproject.toml
+```{code-block} toml
+---
+caption: pyproject.toml
+lineno-start: 16
+---
+
 [tool.coverage.run]
 parallel = true
 ```
@@ -999,6 +1008,7 @@ by Jules Verne (1870)
 [click.option]: https://click.palletsprojects.com/en/7.x/options/
 [context manager]: https://docs.python.org/3/reference/datamodel.html#context-managers
 [core-metadata-provides-extra]: https://packaging.python.org/specifications/core-metadata/#provides-extra-multiple-use
+[coverage-excluding-code]: https://coverage.readthedocs.io/en/coverage-5.3/excluding.html
 [factoryboy]: https://factoryboy.readthedocs.io/
 [fail_under]: https://coverage.readthedocs.io/en/stable/config.html#report
 [generator]: https://docs.python.org/3/tutorial/classes.html#generators
@@ -1016,6 +1026,7 @@ by Jules Verne (1870)
 [pytest-mock]: https://github.com/pytest-dev/pytest-mock
 [pytest-scope]: https://docs.pytest.org/en/latest/fixture.html#scope-sharing-a-fixture-instance-across-tests-in-a-class-module-or-session
 [pytest]: https://docs.pytest.org/en/latest/
+[runpy]: https://docs.python.org/3/library/runpy.html
 [session.posargs]: https://nox.thea.codes/en/stable/config.html#passing-arguments-into-sessions
 [side_effect]: https://docs.python.org/3/library/unittest.mock.html#unittest.mock.Mock.side_effect
 [str.format]: https://docs.python.org/3/library/stdtypes.html#str.format
@@ -1037,4 +1048,3 @@ by Jules Verne (1870)
 [wikipedia-language-editions]: https://en.wikipedia.org/wiki/List_of_Wikipedias
 [writing a failing test]: https://www.icemobile.com/uploads/inline/test.driven.development.cartoon_0.jpeg
 [zsh]: https://www.zsh.org/
-
