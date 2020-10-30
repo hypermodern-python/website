@@ -133,7 +133,8 @@ Nox makes it easy to run any kind of job in an isolated environment,
 with only those dependencies installed that the job needs.
 Nox sessions are defined in a Python file named `noxfile.py`,
 located in the project directory.
-A session consists of a virtual environment
+
+A Nox session consists of a virtual environment
 and a set of commands to run in that environment.
 While the Poetry environment allows you to
 interact with your package during development,
@@ -318,7 +319,7 @@ Coverage.py comes with a command-line interface named `coverage`, sporting a num
 In the simplest case, checking test coverage is a two-step process:
 
 - `coverage run` executes a script or module (via the `-m` option) and collects coverage data.
-- `coverage report` prints a textual summary of the coverage data.
+- `coverage report` analyzes the coverage data and prints a textual summary.
 
 ```{note}
 The form `coverage run -m pytest` is a convenient way to
@@ -433,7 +434,19 @@ yet it achieved full coverage.
 
 ![verne03]
 
-Let's adapt the Nox session to collect coverage data:
+- Use `coverage run` in the tests session.
+- Problem: Each `coverage run` overwrites existing data.
+- "Solution": Use `tool.coverage.run.append`.
+- Problem: Coverage data becomes stale.
+- "Solution": Invoke `coverage erase`.
+- Problem: Source files from different environments are counted separately.
+- Problem: Filenames are hard to read because they point into the virtual environments.
+- Solution: Use `coverage combine` with `tool.coverage.run.parallel` and `tool.coverage.paths`.
+- Add a second session with `coverage report`
+
+
+Let's adapt the Nox session to collect the coverage data for us.
+We'll also add a second session to generate the coverage report.
 
 ```{code-block} python
 ---
@@ -445,8 +458,44 @@ import nox
 
 @nox.session(python=["3.9", "3.8"])
 def tests(session):
-    session.install("pytest", ".")
+    session.install("pytest", "coverage[toml]" ".")
     session.run("coverage", "run", "-m", "pytest", *session.posargs)
+
+@nox.session
+def coverage(session):
+    session.install("coverage[toml]")
+    session.run("coverage", "report")
+```
+
+```{note}
+The second `@nox.session` decorator does not specify any Python versions.
+This means that the coverage session only runs once per Nox invocation,
+using the same Python version as Nox itself.
+```
+
+---
+
+```{code-block} python
+---
+caption: noxfile.py
+linenos: true
+---
+
+import nox
+
+@nox.session(python=["3.9", "3.8"])
+def tests(session):
+    session.install("pytest", "coverage[toml]" ".")
+    session.run("coverage", "run", "-m", "pytest", *session.posargs)
+
+@nox.session
+def coverage(session):
+    session.install("coverage[toml]")
+
+    if any(Path().glob(".coverage.*")):
+        session.run("coverage", "combine")
+
+    session.run("coverage", "report")
 ```
 
 ---
