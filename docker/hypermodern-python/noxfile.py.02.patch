@@ -1,0 +1,10 @@
+--- a/noxfile.py	2020-10-29 21:53:27.000000000 +0100
++++ b/noxfile.py	2020-10-29 23:51:27.000000000 +0100
+@@ -2,5 +2,5 @@
+ 
+ @nox.session(python=["3.9", "3.8"])
+ def tests(session):
+-    session.install("pytest", ".")
+-    session.run("pytest", *session.posargs)
++    session.install("pytest", "coverage[toml]", ".")
++    session.run("coverage", "run", "-m", "pytest", *session.posargs)

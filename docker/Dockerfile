@@ -156,6 +156,11 @@ COPY hypermodern-python/noxfile.py noxfile.py
 RUN nox
 RUN nox --session=tests --python=3.9 --reuse-existing-virtualenvs
 RUN nox -p 3.9 -rs tests
+COPY hypermodern-python/noxfile.py.01.patch /tmp/patch
+RUN patch -p1 < /tmp/patch
+RUN nox --session=tests -- tests/test_main.py
+RUN nox --session=tests -- -k test_main_succeeds
+RUN nox --session=tests -- --verbose
 
 #
 # Code coverage with Coverage.py
@@ -172,4 +177,12 @@ RUN patch -p1 < /tmp/patch
 RUN poetry run coverage run -m pytest
 RUN poetry run coverage report
 COPY hypermodern-python/pyproject.toml.05.patch /tmp/patch
+RUN patch -p1 < /tmp/patch
+
+#
+# Automated coverage with Nox
+#
+
+FROM coverage as noxcoverage
+COPY hypermodern-python/noxfile.py.02.patch /tmp/patch
 RUN patch -p1 < /tmp/patch
