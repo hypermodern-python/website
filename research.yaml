@@ -1,0 +1,85 @@
+Build backends:
+  dephell:
+    homepage: https://dephell.org/
+  enscons:
+    homepage: https://github.com/dholth/enscons
+  hatch:
+    maintainer: Ofek Lev
+    homepage: https://github.com/ofek/hatch
+    repository: https://github.com/ofek/hatch
+  pbr:
+    homepage: https://docs.openstack.org/pbr/latest/
+  pdm:
+    homepage: https://pdm.fming.dev/
+  pyflow:
+    maintainer: David O'Connor
+    homepage: https://github.com/David-OConnor/pyflow
+    repository: https://github.com/David-OConnor/pyflow
+  pymsbuild:
+    maintainer: Steve Dower
+    homepage: https://github.com/zooba/pymsbuild
+    repository: https://github.com/zooba/pymsbuild 
+  
+Bundlers:
+  briefcase:
+    homepage: https://beeware.org/project/projects/tools/briefcase/
+    maintainer: Russell Keith-Magee
+    platforms: Mac, Windows, Linux, iOS, Android
+  pyship:
+    homepage: https://github.com/jamesabel/pyship
+    description: installer with embedded Python
+    maintainer: James Abel
+    platforms: Windows, ...
+    includes-python: true
+    project-status: unreleased
+  pyoxidizer:
+    homepage: https://pyoxidizer.readthedocs.io/
+    description: binaries with embedded Python
+    maintainer: Gregory Szorc
+    written-in: Rust
+    platforms: Windows, Linux, Mac
+    includes-python: true
+  pyinstaller:
+    homepage: https://www.pyinstaller.org/
+    maintainer: Hartmut Goebel
+    platforms: Windows, Linux, Mac
+    includes-python: true
+  py2exe:
+    homepage: http://www.py2exe.org/
+    description: Windows distutils extension
+    maintainer: Alberto Sottile
+    platforms: Windows
+  py2app:
+    homepage: https://py2app.readthedocs.io/en/latest/
+    description: setuptools command for macOS applications, similar to py2exe
+    maintainer: Ronald Oussoren
+    platforms: Mac
+  cx-freeze:
+    homepage: https://cx-freeze.readthedocs.io/en/latest/
+    description: cross-platform freezer similar to py2{app,exe}, separate Python DLL
+  shiv:
+    homepage: https://shiv.readthedocs.io/en/latest/
+    description: zipapps with dependencies
+  pex:
+    homepage: https://github.com/pantsbuild/pex
+    description: Python executable files similar to shiv, works with pants [Twitter], pygradle [LinkedIn], Buck [Facebook]
+  xar:
+    homepage: https://github.com/facebookincubator/xar/
+    description: Facebook-backed mountable executable archive using SquashFS
+    platforms: Linux
+  nuitka:
+    homepage: http://nuitka.net/pages/overview.html
+    description: Python compiler
+  pyrun:
+    homepage: https://www.egenix.com/products/python/PyRun
+    description: Python installer
+    maintainer: Marc-Andre Lemburg
+  pynsist:
+    homepage: https://pynsist.readthedocs.io/en/latest/index.html
+    description: Windows installer with bundled Python
+  bazel:
+    homepage: https://docs.bazel.build/versions/master/be/python.html
+
+Related Resources:
+  The Big List of Python Packaging and Distribution Tools:
+    homepage: https://grassfedcode.com/python-packaging/
