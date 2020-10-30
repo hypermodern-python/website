@@ -153,20 +153,6 @@ versions are accessible as `python3.8` and `python3.9`, respectively.
 similar in spirit to JavaScript's `npm` and Rust's `cargo`.
 Common alternatives are [pipenv], [setuptools] with [pip-tools], and [flit].
 
-<!-- 
-[dephell]: https://dephell.org/
-[enscons]: https://github.com/dholth/enscons
-[hatch]: https://github.com/ofek/hatch
-[pbr]: https://docs.openstack.org/pbr/latest/
-[pdm]: https://pdm.fming.dev/
-[pyflow]: https://github.com/David-OConnor/pyflow
-[pymsbuild]: https://github.com/zooba/pymsbuild
-
-The Big List of Python Packaging and Distribution Tools:
-
-[cs01-python-packaging]: https://grassfedcode.com/python-packaging/
--->
-
 Install Poetry by downloading and running [get-poetry.py]:
 
 ```sh
@@ -477,17 +463,15 @@ hypermodern-python, version 0.1.0
 
 Using the name `__main__.py` for this module is not a mere convention.
 If you invoke Python with the option `-m` followed by the name of your package,
-it executes this module, and sets its name to `__main__`.
+it executes this module as the top-level scope, which is called `__main__`.
 
-```{tip}
-Isn't this module always named `__main__`?
-Actually, no.
-When imported normally, the module name is `hypermodern_python.__main__`,
-prefixed by the package name.
-```
+A module can detect this situation by looking at its `__name__` attribute.
+When the module is run as a script, the module is named `__main__`.
+When the module is imported normally, its name is prefixed by the package:
+`hypermodern_python.__main__` in our case.
 
 To leverage this, add two lines to the bottom of the module,
-to invoke `main` when the module is run as a script:
+to invoke the `main` function when the module is run as a script:
 
 ```{code-block} python
 ---
@@ -530,7 +514,7 @@ Invoking a script using Python's `-m` option can be advantageous in some situati
 
 - The script can be located using the Python module namespace rather than the filesystem.
 - You don't require an entry-point script at all.
-- You can specify [exactly which Python][xkcd1987] you want to run the application with.
+- You can specify exactly [which Python][xkcd1987] you want to run the application with.
 
 ## Example: Consuming an API with httpx
 
@@ -719,6 +703,21 @@ Password:
  - Uploading hypermodern_python-0.1.0-py3-none-any.whl 100%
 ```
 
+Before creating the next release of your package, you need to bump the version of your package.
+Use [poetry version] to update the version declared in ``pyproject.toml``:
+
+```sh
+$ poetry version 1.0.0
+```
+
+You can pass the new version explicitly, or a rule such as ``major``, ``minor``, or ``patch``.
+In a nutshell, increment the major version if the release contains breaking changes,
+the patch level if the release contains only bugfixes,
+and the minor version in all other cases.
+This assumes that your project has a stable and public API,
+and a version number greater than or equal to `1.0.0`.
+For more details, refer to the [Semantic Versioning] standard.
+
 ```{note}
 In the last chapter of this guide, we are going to automate the PyPI release process.
 Automation helps you ensure your Python package passes all checks before it is published,
@@ -895,6 +894,7 @@ by Albert Robida, ca 1902
 [poetry publish]: https://python-poetry.org/docs/cli/#publish
 [poetry run]: https://python-poetry.org/docs/cli/#run
 [poetry update]: https://python-poetry.org/docs/cli/#update
+[poetry version]: https://python-poetry.org/docs/cli/#version
 [pyenv-wiki]: https://github.com/pyenv/pyenv/wiki
 [pyenv]: https://github.com/pyenv/pyenv
 [pyproject.toml]: https://python-poetry.org/docs/pyproject/
