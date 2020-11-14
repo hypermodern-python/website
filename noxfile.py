@@ -14,7 +14,13 @@ nox.options.sessions = ["docs-build"]
 def docs_build(session: Session) -> None:
     """Build the documentation."""
     args = session.posargs or ["docs", "docs/_build"]
-    session.install("sphinx", "furo", "myst-parser", "pygments-pytest")
+    session.install(
+        "sphinx",
+        "furo",
+        "myst-parser",
+        "pygments-pytest",
+        "sphinx-copybutton",
+    )
 
     build_dir = Path("docs", "_build")
     if build_dir.exists():
@@ -27,7 +33,13 @@ def docs_build(session: Session) -> None:
 def docs(session: Session) -> None:
     """Build and serve the documentation with live reloading on file changes."""
     args = session.posargs or ["--open-browser", "docs", "docs/_build"]
-    session.install("sphinx-autobuild", "furo", "myst-parser", "pygments-pytest")
+    session.install(
+        "sphinx-autobuild",
+        "furo",
+        "myst-parser",
+        "pygments-pytest",
+        "sphinx-copybutton",
+    )
 
     build_dir = Path("docs", "_build")
     if build_dir.exists():
