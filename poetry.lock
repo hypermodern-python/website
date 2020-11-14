@@ -80,7 +80,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
 name = "furo"
-version = "2020.11.14b16"
+version = "2020.11.15b17"
 description = "A clean customisable Sphinx documentation theme."
 category = "dev"
 optional = false
@@ -418,7 +418,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "8526f555333156daac5036b7a054370992f1460b460d61c3a046e4d4131a71fe"
+content-hash = "710765e3f1af0e6b2f8287db1d3350cf7aa3172f80b2ca9828c94c61edb97b91"
 
 [metadata.files]
 alabaster = [
@@ -455,8 +455,8 @@ docutils = [
     {file = "docutils-0.16.tar.gz", hash = "sha256:c2de3a60e9e7d07be26b7f2b00ca0309c207e06c100f9cc2a94931fc75a478fc"},
 ]
 furo = [
-    {file = "furo-2020.11.14b16-py3-none-any.whl", hash = "sha256:bba0a03d53ee9bc37715bb34311f507aa70fca3d59fa56fe10f88422eb94d1ae"},
-    {file = "furo-2020.11.14b16.tar.gz", hash = "sha256:64426381a7de24eac146c996fa463ec1a4e281146db0af183247137b8663af9f"},
+    {file = "furo-2020.11.15b17-py3-none-any.whl", hash = "sha256:0186e01b9be564679f15d8fda313baff633ae11d5bd28147ac8e4668eb143d62"},
+    {file = "furo-2020.11.15b17.tar.gz", hash = "sha256:f34cb10ca26967b03e7511349974d720bc49709835b022944ca6c881221f1f2c"},
 ]
 idna = [
     {file = "idna-2.10-py2.py3-none-any.whl", hash = "sha256:b97d804b1e9b523befed77c48dacec60e6dcb0b5391d57af6a65a312a90648c0"},
