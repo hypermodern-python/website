@@ -8,41 +8,29 @@ from nox.sessions import Session
 
 
 nox.options.sessions = ["docs-build"]
+sphinx_extensions = [
+    "furo",
+    "myst-parser",
+    "pygments-pytest",
+    "sphinx-copybutton",
+]
 
 
 @nox.session(name="docs-build", python="3.8")
 def docs_build(session: Session) -> None:
     """Build the documentation."""
+    shutil.rmtree(Path("docs", "_build"), ignore_errors=True)
+
     args = session.posargs or ["docs", "docs/_build"]
-    session.install(
-        "sphinx",
-        "furo",
-        "myst-parser",
-        "pygments-pytest",
-        "sphinx-copybutton",
-    )
-
-    build_dir = Path("docs", "_build")
-    if build_dir.exists():
-        shutil.rmtree(build_dir)
-
+    session.install("sphinx", *sphinx_extensions)
     session.run("sphinx-build", *args)
 
 
 @nox.session(python="3.8")
 def docs(session: Session) -> None:
     """Build and serve the documentation with live reloading on file changes."""
+    shutil.rmtree(Path("docs", "_build"), ignore_errors=True)
+
     args = session.posargs or ["--open-browser", "docs", "docs/_build"]
-    session.install(
-        "sphinx-autobuild",
-        "furo",
-        "myst-parser",
-        "pygments-pytest",
-        "sphinx-copybutton",
-    )
-
-    build_dir = Path("docs", "_build")
-    if build_dir.exists():
-        shutil.rmtree(build_dir)
-
+    session.install("sphinx-autobuild", *sphinx_extensions)
     session.run("sphinx-autobuild", *args)
