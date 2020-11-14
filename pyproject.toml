@@ -11,6 +11,7 @@ python = "^3.8"
 Sphinx = "^3.3.1"
 sphinx-autobuild = "^2020.9.1"
 myst-parser = "^0.12.10"
+furo = "^2020.11.14-beta.16"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
