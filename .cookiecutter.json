@@ -1,0 +1,10 @@
+{
+  "_template": "https://github.com/cjolowicz/cookiecutter-hypermodern-python.git",
+  "author": "Claudio Jolowicz",
+  "email": "mail@claudiojolowicz.com",
+  "friendly_name": "Hypermodern Python Website",
+  "github_user": "hypermodern-python",
+  "package_name": "hypermodern_python_website",
+  "project_name": "hypermodern-python-website",
+  "version": "0.0.0"
+}
