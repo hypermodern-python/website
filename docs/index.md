@@ -1,5 +1,10 @@
 # Hypermodern Python
 
+```{toctree}
+:hidden:
+Setup <chapter01>
+```
+
 ![opera-restaurant]
 
 This article series [^*] is a guide to modern Python tooling
