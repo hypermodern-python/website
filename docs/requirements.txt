@@ -1,0 +1,5 @@
+sphinx=3.3.1
+sphinx-autobuild=2020.9.1
+myst-parser=0.12.10
+furo=2020.11.14b16
+pygments-pytest=2.1.0
