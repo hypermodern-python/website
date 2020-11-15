@@ -548,7 +548,7 @@ TOTAL                                    7      0      0      0   100%
 
 ## Mocking with pytest-mock
 
-![verne-moon-landing]
+![verne-landing]
 
 Unit tests should be [fast, isolated, and repeatable][testing-first-principle].
 The test for `__main__.main` is neither of these:

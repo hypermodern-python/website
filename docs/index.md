@@ -3,6 +3,7 @@
 ```{toctree}
 :hidden:
 Setup <chapter01>
+Testing <chapter02>
 ```
 
 ![opera-restaurant]
