@@ -11,9 +11,6 @@ that uses the Wikipedia API to display random facts on the console.
 ```{tip}
 This guide has a companion repository: [cjolowicz/hypermodern-python].
 Each article in the guide corresponds to a set of commits in the GitHub repository.
-```
-
-```{important}
 Throughout this guide, replace `hypermodern-python` with the name of your own repository.
 Choosing a different name avoids a name collision on [PyPI].
 ```
