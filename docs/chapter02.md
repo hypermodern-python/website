@@ -134,12 +134,14 @@ with only those dependencies installed that the job needs.
 Nox sessions are defined in a Python file named `noxfile.py`,
 located in the project directory.
 
+<!--
 A Nox session consists of a virtual environment
 and a set of commands to run in that environment.
 While the Poetry environment allows you to
 interact with your package during development,
 Nox environments are used to run developer tools
 in a reliable and repeatable way across Python versions.
+-->
 
 Install Nox via [pipx]:
 
@@ -147,6 +149,7 @@ Install Nox via [pipx]:
 pipx install nox
 ```
 
+<!--
 ```{note}
 Do not install Nox as a development dependency with Poetry.
 Nox is a part of your global developer environment, like Poetry, pyenv, and pipx.
@@ -156,6 +159,7 @@ enter a complex situation where environments are spawned from other environments
 To quote the [Zen of Python][PEP 20],
 "Flat is better than nested."
 ```
+-->
 
 Create a `noxfile.py` with the following contents:
 
