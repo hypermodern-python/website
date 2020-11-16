@@ -215,23 +215,21 @@ and ran the session inside it.
 By default, Nox runs every session defined in `noxfile.py`,
 on every listed Python version.
 Virtual environments are created from scratch on each invocation.
+
 While this is a safe default,
 you may find you need to speed things up during development.
 It is possible to restrict Nox runs to specific sessions and interpreters,
 and reuse existing virtual environments:
 
 ```sh
-nox --session=tests --python=3.9 --reuse-existing-virtualenvs
+nox --python=3.9 --session=tests --reuse-existing-virtualenvs
 ```
 
-````{tip}
-If that seems like a mouthful,
-you'll be delighted to hear that the following is equivalent:
+You can abbreviate this command using short options:
 
-  ```sh
-  nox -p 3.9 -rs tests
-  ```
-````
+```sh
+nox -p 3.9 -rs tests
+```
 
 Nox allows you to pass arbitrary options to a session after the `--` separator.
 These session options are available via the [session.posargs] variable.
