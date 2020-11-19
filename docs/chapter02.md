@@ -358,7 +358,13 @@ tests/test_main.py                       9      0      0      0   100%
 TOTAL                                   25      1      2      1    93%
 ```
 
-The coverage report shows missing coverage at the end of the `__main__.py` module:
+The coverage report shows missing coverage at the end of the `__main__.py` module.
+Let's inspect the `Missing` column more closely:
+
+- `25->26` tells us that the condition on line `25` never evaluated to `True`.
+- `26` tells us that line `26` was never executed.
+
+Here are the relevant lines from `__main__.py` again:
 
 ```{code-block} python
 ---
@@ -370,9 +376,9 @@ if __name__ == "__main__":
     main(prog_name="hypermodern_python")
 ```
 
-Let's inspect the `Missing` column more closely.
-`26` tells us that line `26` was never executed.
-`25->26` relates to branch coverage, and tells us that the condition on line `25` never evaluated to `True`.
+<!--
+This is an indicator of missing branch coverage.
+
 The `if` clause is missing from coverage because
 its condition only evaluates to `True` when the module is run as a script.
 
@@ -385,17 +391,18 @@ This specific code path is never executed by the test suite.
 Branch coverage alerts us to this situation.
 ```
 
-<!--
 Exercising this code path from the test suite is not impossible
 (see [runpy] from the standard library for one approach).
 -->
 
 `if __name__ == "__main__"` blocks are often [excluded from coverage][coverage-excluding-code]:
 They are trivial boilerplate, yet cumbersome to exercise from a test.
-Code can be excluded from Coverage.py via the configuration option `tool.coverage.report.exclude_lines`,
-which takes a list of regular expressions.
-Alternatively, you can apply a special marker comment to a line or block of code,
-which is the approach we'll take here:
+Code can be excluded from Coverage.py using two main methods:
+
+- The configuration option `tool.coverage.report.exclude_lines` takes a list of regular expressions.
+- You can apply a special marker comment to a line or block of code: `# pragma: no cover`
+
+We will take the second approach here:
 
 ```{code-block} python
 ---
@@ -407,7 +414,6 @@ if __name__ == "__main__":  # pragma: no cover
     main(prog_name="hypermodern_python")
 ```
 
-The reported code coverage is now at 100%.
 Aiming for full code coverage is generally a good idea, especially for a fresh code base.
 Anything less than that implies that some part of your code base is definitely untested.
 And to quote [Bruce Eckel], "If it's not tested, it's broken."
@@ -420,16 +426,14 @@ using the option `tool.coverage.report.fail_under`:
 ---
 caption: pyproject.toml
 lineno-start: 25
-emphasize-lines: "3"
 ---
 
 [tool.coverage.report]
-show_missing = true
 fail_under = 100
 ```
 
 ```{important}
-Code coverage tells you that all lines and branches in your code base were hit.
+Code coverage tells you which lines and branches in your code base were hit.
 This does not imply that your test suite has meaningful test cases for all uses and misuses of your program.
 Take our test case, for example:
 It did not check the functionality of the program at all, only its exit status;
