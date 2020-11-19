@@ -440,75 +440,25 @@ It did not check the functionality of the program at all, only its exit status;
 yet it achieved full coverage.
 ```
 
-## Automated coverage with Nox
+## Automating coverage using Nox
 
 ![verne-white-dog]
 
-- Use `coverage run` in the tests session.
-- Problem: Each `coverage run` overwrites existing data.
-- "Solution": Use `tool.coverage.run.append`.
-- Problem: Coverage data becomes stale.
-- "Solution": Invoke `coverage erase`.
-- Problem: Source files from different environments are counted separately.
-- Problem: Filenames are hard to read because they point into the virtual environments.
-- Solution: Use `coverage combine` with `tool.coverage.run.parallel` and `tool.coverage.paths`.
-- Add a second session with `coverage report`
+In this section, we update the Nox sessions to collect coverage data when running tests,
+and display a coverage report on the terminal.
+But first we need to configure Coverage.py for its use in Nox environments,
+to account for two differences compared to running in the Poetry environment:
 
+- The test suite in Nox sessions runs against the installed package.
+  In the Poetry environment, they run against the source tree in your working directory.
+- The tests are run with different versions of Python.
+  Coverage reports should include coverage data from all of them.
 
-Let's adapt the Nox session to collect the coverage data for us.
-We'll also add a second session to generate the coverage report.
-
-```{code-block} python
----
-caption: noxfile.py
-linenos: true
----
-
-import nox
-
-@nox.session(python=["3.9", "3.8"])
-def tests(session):
-    session.install("pytest", "coverage[toml]" ".")
-    session.run("coverage", "run", "-m", "pytest", *session.posargs)
-
-@nox.session
-def coverage(session):
-    session.install("coverage[toml]")
-    session.run("coverage", "report")
-```
-
-```{note}
-The second `@nox.session` decorator does not specify any Python versions.
-This means that the coverage session only runs once per Nox invocation,
-using the same Python version as Nox itself.
-```
-
----
-
-```{code-block} python
----
-caption: noxfile.py
-linenos: true
----
-
-import nox
-
-@nox.session(python=["3.9", "3.8"])
-def tests(session):
-    session.install("pytest", "coverage[toml]" ".")
-    session.run("coverage", "run", "-m", "pytest", *session.posargs)
-
-@nox.session
-def coverage(session):
-    session.install("coverage[toml]")
-
-    if any(Path().glob(".coverage.*")):
-        session.run("coverage", "combine")
-
-    session.run("coverage", "report")
-```
-
----
+To start with, configure Coverage.py to run in [parallel mode][coverage-combine].
+This causes Coverage.py to create separate data files for every run,
+rather than erasing the previous coverage data at each run.
+The data files can be combined later on using the `coverage combine` command.
+Enable parallel mode using the `tool.coverage.run.parallel` option:
 
 ```{code-block} toml
 ---
@@ -520,40 +470,84 @@ lineno-start: 16
 parallel = true
 ```
 
-```toml
-# pyproject.toml
+Filenames in coverage data point to the installed package in the Nox environments.
+Not only are these paths hard to read, they also depend on the Python version used.
+Let's tell Coverage.py how to map paths to installed modules back to their source code:
+
+```{code-block} toml
+---
+caption: pyproject.toml
+lineno-start: 16
+---
+
+
 [tool.coverage.paths]
 source = ["src", "*/site-packages"]
 ```
 
 Entries under `tool.coverage.paths` list paths that are considered equivalent.
-An important use of this option is to map paths to installed modules back to their source code.
 The first value in an entry is the location of the source code
 (the `src` directory in your project).
 The second value is a file pattern to match against paths of collected data.
 Python packages are installed into a directory named `site-packages`,
-so we can use this name in a wildcard pattern.
+so we use this name in a wildcard pattern.
 
-To enable coverage reporting, invoke `pytest` with the `--cov` option:
+The listing below shows the full Coverage configuration at this point:
 
-```pytest
-$ poetry run pytest --cov
-============================= test session starts ==============================
-platform linux -- Python 3.8.2, pytest-5.3.4, py-1.8.1, pluggy-0.13.1
-rootdir: /hypermodern-python
-plugins: cov-2.8.1
-collected 1 item
+```{code-block} toml
+---
+caption: pyproject.toml
+lineno-start: 16
+---
 
-tests/test_console.py .                                                 [100%]
 
---------------- coverage: platform linux, python 3.8.2-final-0 -----------------
-Name                                 Stmts   Miss Branch BrPart  Cover   Missing
---------------------------------------------------------------------------------
-src/hypermodern_python/__init__.py       1      0      0      0   100%
-src/hypermodern_python/console.py        6      0      0      0   100%
---------------------------------------------------------------------------------
-TOTAL                                    7      0      0      0   100%
-============================== 1 passed in 0.09s ===============================
+[tool.coverage.run]
+source = ["hypermodern_python", "tests"]
+branch = true
+parallel = true
+
+[tool.coverage.paths]
+source = ["src", "*/site-packages"]
+
+[tool.coverage.report]
+fail_under = 100
+show_missing = true
+```
+
+Adapt the Nox session to collect the coverage data when running tests:
+
+```{code-block} python
+---
+caption: noxfile.py
+linenos: true
+---
+
+import nox
+
+@nox.session(python=["3.9", "3.8"])
+def tests(session):
+    session.install("pytest", "coverage[toml]", ".")
+    session.run("coverage", "run", "-m", "pytest", *session.posargs)
+```
+
+Add a second session named `coverage`.
+This session combines the coverage data from all the test runs.
+It then generates the final coverage report.
+The coverage session runs on the same Python version as Nox itself,
+using the `@nox.session` decorator without arguments.
+
+```{code-block} python
+---
+caption: noxfile.py
+linenos: true
+lineno-start: 8
+---
+
+@nox.session
+def coverage(session):
+    session.install("coverage[toml]")
+    session.run("coverage", "combine")
+    session.run("coverage", "report")
 ```
 
 ## Mocking with pytest-mock
@@ -1107,6 +1101,7 @@ by Jules Verne (1870)
 [click.option]: https://click.palletsprojects.com/en/7.x/options/
 [context manager]: https://docs.python.org/3/reference/datamodel.html#context-managers
 [core-metadata-provides-extra]: https://packaging.python.org/specifications/core-metadata/#provides-extra-multiple-use
+[coverage-combine]: https://coverage.readthedocs.io/en/coverage-5.3/cmd.html#combining-data-files-coverage-combine
 [coverage-excluding-code]: https://coverage.readthedocs.io/en/coverage-5.3/excluding.html
 [factoryboy]: https://factoryboy.readthedocs.io/
 [fail_under]: https://coverage.readthedocs.io/en/stable/config.html#report
