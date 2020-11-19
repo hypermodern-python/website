@@ -12,7 +12,6 @@ and teach the random fact generator foreign languages.
 ![verne-oxen]
 
 It's never too early to add unit tests to a project. 
-
 Unit tests, as the name says, verify the functionality of a *unit of code*,
 such as a single function or class.
 While the [unittest] framework is part of the Python standard library,
@@ -25,6 +24,7 @@ using [poetry add] with the `--dev` option:
 poetry add --dev pytest
 ```
 
+<!--
 ```{note}
 Dependencies are Python packages used by your project,
 and they come in two types:
@@ -42,6 +42,7 @@ and they come in two types:
   These dependencies are not a part of distribution packages,
   because users do not require them to run your code.
 ```
+-->
 
 Organize tests in a [separate file hierarchy][pytest-good-practices] next to `src`, named `tests`:
 
@@ -61,8 +62,8 @@ it allows your test suite to mirror the source layout of the package under test,
 even when modules in different parts of the source tree [have the same name][pytest-issues-3151].
 Furthermore, it gives you the option to import modules from within your tests package.
 
-The file `test_main.py` contains a test case for the `__main__` module,
-which checks whether the program exits with a status code of zero.
+The file `test_main.py` contains a test case for the `__main__` module.
+The test case checks whether the program exits with a status code of zero.
 
 ```{code-block} python
 ---
@@ -80,9 +81,9 @@ def test_main_succeeds():
     assert result.exit_code == 0
 ```
 
-Click's `CliRunner` can invoke the command-line interface from within a test case.
-Since this is likely to be needed by most test cases in this module,
-let's turn it into a *fixture*.
+`click.testing.CliRunner` can invoke the command-line interface from within a test case.
+Most test cases in the `test_main` module will need an instance of this class.
+Let's turn `runner` into a *fixture*.
 
 [Test fixtures][pytest-fixture] are simple functions declared with the `pytest.fixture` decorator.
 Test cases can use a test fixture by including a function parameter with the same name as the fixture.
@@ -92,7 +93,6 @@ When the test case is run, the parameter receives the return value of the fixtur
 ---
 caption: tests/test_main.py
 linenos: true
-emphasize-lines: 6-8
 ---
 
 import click.testing
@@ -118,7 +118,7 @@ platform linux -- Python 3.9.0, pytest-6.1.1, py-1.9.0, pluggy-0.13.1
 rootdir: /root/hypermodern-python
 collected 1 item
 
-tests/test_main.py .                                          [100%]
+tests/test_main.py .                                           [100%]
 
 ========================= 1 passed in 1.20s =========================
 ```
