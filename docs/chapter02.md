@@ -128,19 +128,21 @@ tests/test_main.py .                                           [100%]
 ![verne-steam-rocket]
 
 [Nox] automates testing in multiple Python environments.
+Nox sessions are defined in a Python file named `noxfile.py`,
+located in the project directory.
+They consist of a virtual environment
+and a set of commands to run in that environment.
+
+```{hint}
+Both Poetry and Nox set up virtual environments for your project.
+While the Poetry environment lets you interact with your package during development,
+Nox environments are useful for running developer tools in a repeatable way across multiple Python versions.
+```
+
+<!--
 Like its older sibling [tox],
 Nox makes it easy to run any kind of job in an isolated environment,
 with only those dependencies installed that the job needs.
-Nox sessions are defined in a Python file named `noxfile.py`,
-located in the project directory.
-
-<!--
-A Nox session consists of a virtual environment
-and a set of commands to run in that environment.
-While the Poetry environment allows you to
-interact with your package during development,
-Nox environments are used to run developer tools
-in a reliable and repeatable way across Python versions.
 -->
 
 Install Nox via [pipx]:
@@ -177,22 +179,13 @@ def tests(session):
     session.run("pytest")
 ```
 
-For now, this file defines a single session named `tests`,
-which will be run on Python 3.9 and 3.8.
-The session installs and runs pytest.
-The second argument to `session.install` refers to the current directory,
-in other words, to your package.
+This file defines a session named `tests` that installs and runs pytest.
+The second argument to `session.install` refers to the current directory, containing your Poetry project.
+This means that the session installs your package into the same environment as pytest.
 
-```{hint}
-Does it seem mysterious how `session.install(".")` gets your package installed?
-[pip], which is what Nox uses behind the scenes,
-will build and install a wheel from any source directory passed to it,
-using the build backend specified in its `pyproject.toml`.
-In this case, the directory contains your Python package,
-and the build backend is Poetry.
-```
-
-Let's see what happens if we invoke `nox`:
+Invoke `nox` without options,
+and it will create a virtual environment for each listed Python version,
+and run the session inside it:
 
 ```sh
 $ nox
@@ -214,16 +207,26 @@ nox > * tests-3.9: success
 nox > * tests-3.8: success
 ```
 
-Nox created a virtual environment for each Python version,
-and ran the session inside it.
-By default, Nox runs every session defined in `noxfile.py`,
-on every listed Python version.
-Virtual environments are created from scratch on each invocation.
+```{hint}
+It may seem mysterious how `session.install(".")` gets your package installed.
+[pip], which is what Nox uses behind the scenes,
+will build and install a wheel from any source directory passed to it,
+using the build backend specified in its `pyproject.toml`.
+In this case, the directory contains your Python package,
+and the build backend is Poetry.
+```
 
+By default, Nox runs every session defined in `noxfile.py`,
+but you can narrow this down:
+
+- Use the `--session` option to restrict runs to a specific session.
+- Use the `--python` option to restrict runs to a specific Python version.
+
+Virtual environments are created from scratch on each invocation.
 While this is a safe default,
 you may find you need to speed things up during development.
-It is possible to restrict Nox runs to specific sessions and interpreters,
-and reuse existing virtual environments:
+Use the `--reuse-existing-virtualenvs` option to reuse environments when they already exist.
+Here is an example of how you would re-run the test suite in the existing environment for Python 3.9:
 
 ```sh
 nox --python=3.9 --session=tests --reuse-existing-virtualenvs
@@ -237,7 +240,8 @@ nox -p 3.9 -rs tests
 
 Nox allows you to pass arbitrary options to a session after the `--` separator.
 These session options are available via the [session.posargs] variable.
-Let's modify the session to forward them to `pytest`:
+This means we can pass additional options to `pytest`, which is quite useful.
+Let's modify the session to forward the session options to `pytest`:
 
 ```{code-block} python
 ---
@@ -253,14 +257,14 @@ def tests(session):
     session.run("pytest", *session.posargs)
 ```
 
-This is especially useful to pass specific test modules or test functions:
+You can use this, for example, to run specific test modules or test functions:
 
 ```sh
 nox --session=tests -- tests/test_main.py
 nox --session=tests -- -k test_main_succeeds
 ```
 
-Another example would be to increase pytest's verbosity:
+Another example would be increasing pytest's verbosity:
 
 ```sh
 nox --session=tests -- --verbose
