@@ -327,7 +327,7 @@ In the simplest case, checking test coverage is a two-step process:
 - `coverage run` executes a script or module (via the `-m` option) and collects coverage data.
 - `coverage report` analyzes the coverage data and prints a textual summary.
 
-```{note}
+```{tip}
 The form `coverage run -m pytest` is a convenient way to
 use the pytest package from the active environment.
 ```
@@ -438,6 +438,8 @@ This does not imply that your test suite has meaningful test cases for all uses 
 Take our test case, for example:
 It did not check the functionality of the program at all, only its exit status;
 yet it achieved full coverage.
+A good way to build up meaningful tests is to
+write a failing test before implementing a feature or fixing a bug.
 ```
 
 ## Automating coverage using Nox
