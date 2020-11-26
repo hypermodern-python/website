@@ -56,14 +56,13 @@ hypermodern-python
 3 directories, 2 files
 ```
 
-The file `__init__.py` is empty and serves to declare the test suite as a package.
-While this is not strictly necessary,
-it allows your test suite to mirror the source layout of the package under test,
-even when modules in different parts of the source tree [have the same name][pytest-issues-3151].
+The file `__init__.py` is empty and turns the test suite into a Python package.
+This arrangement allows it to mirror the source layout of the package under test,
+even when modules in different parts of the source tree have the same name.
 Furthermore, it gives you the option to import modules from within your tests package.
 
-The file `test_main.py` contains a test case for the `__main__` module.
-The test case checks whether the program exits with a status code of zero.
+The file `test_main.py` contains tests for the `__main__` module.
+Our first test case checks whether the program exits with a status code of zero:
 
 ```{code-block} python
 ---
@@ -81,12 +80,13 @@ def test_main_succeeds():
     assert result.exit_code == 0
 ```
 
-`click.testing.CliRunner` can invoke the command-line interface from within a test case.
-Most test cases in the `test_main` module will need an instance of this class.
-Let's turn `runner` into a *fixture*.
+The test case uses `click.testing.CliRunner` to invoke the command-line interface in an isolated way.
+This class makes it easy to inspect the output and exit code of your program without launching a subprocess.
+Most test cases in the `test_main` module will need a `runner` instance.
+Let's turn `runner` into a reusable *fixture*.
 
 [Test fixtures][pytest-fixture] are simple functions declared with the `pytest.fixture` decorator.
-Test cases can use a test fixture by including a function parameter with the same name as the fixture.
+Test cases can use a fixture by including a function parameter with the same name.
 When the test case is run, the parameter receives the return value of the fixture function.
 
 ```{code-block} python
@@ -1115,7 +1115,6 @@ by Jules Verne (1870)
 [pytest-cov]: https://pytest-cov.readthedocs.io/en/latest/
 [pytest-fixture]: https://docs.pytest.org/en/latest/fixture.html
 [pytest-good-practices]: http://doc.pytest.org/en/latest/goodpractices.html#tests-outside-application-code
-[pytest-issues-3151]: https://github.com/pytest-dev/pytest/issues/3151#issuecomment-360493948
 [pytest-markers]: https://docs.pytest.org/en/latest/example/markers.html
 [pytest-mock]: https://github.com/pytest-dev/pytest-mock
 [pytest-scope]: https://docs.pytest.org/en/latest/fixture.html#scope-sharing-a-fixture-instance-across-tests-in-a-class-module-or-session
