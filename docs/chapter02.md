@@ -477,8 +477,8 @@ parallel = true
 Filenames in coverage data point to the installed package in the Nox environment.
 Not only are those paths hard to read, they also depend on the Python version used.
 Let's tell Coverage.py how to map the paths back to the source code,
-so they are grouped correctly in the coverage report,
-using the `tool.coverage.paths` option:
+so the coverage data can be aggregated correctly for the coverage report.
+This is done using the `tool.coverage.paths` option:
 
 ```{code-block} toml
 ---
@@ -491,12 +491,16 @@ lineno-start: 16
 source = ["src", "*/site-packages"]
 ```
 
-Entries under `tool.coverage.paths` list paths that are considered equivalent.
-The first value in an entry is the location of the source code
-(the `src` directory in your project).
-The second value is a file pattern to match against paths of collected data.
-Python packages are installed into a directory named `site-packages`,
-so we use this name in a wildcard pattern.
+```{note}
+Entries under `tool.coverage.paths` list paths that are considered equivalent:
+
+- The first value in an entry is the location of the source code
+  (the `src` directory in your project).
+
+- The second value is a file pattern to match against paths of collected data.
+  Python packages are installed into a directory named `site-packages`,
+  so we use this name in a wildcard pattern.
+```
 
 The listing below shows the full Coverage configuration at this point:
 
@@ -558,10 +562,71 @@ def coverage(session):
     session.run("coverage", "report")
 ```
 
-As a final touch, we'll make two improvements.
+This simple arrangement already works reasonably well.
+In the remainder of this section,
+we will make two significant improvements to the sessions:
 
-- Use `notify` to make sure coverage is run after tests. This cleans up the data files.
-- Check if the data files exist to avoid failures. If no data files exist, just display a report.
+- Run coverage reports automatically at the end of the test suite.
+- Allow running coverage reports on their own as well.
+
+If you frequently run the `tests` session on its own,
+your working directory will soon be littered with coverage data files
+waiting to be processed by `coverage combine`.
+What's worse, the coverage data in these files gets stale over time.
+This means that coverage reports may no longer reflect the current state of the code base.
+
+For this reason, you should ensure that the coverage session
+is always run after the test suite has completed.
+Luckily, Nox has you covered (pun intended) with the `session.notify` method,
+which triggers one session from another.
+If the notified session is not already selected,
+Nox runs it after all other sessions have completed.
+Exactly the behavior we need here!
+
+We'll wrap this in a `try...finally` block to ensure
+the coverage session runs even if a test failed.
+Here's the updated `tests` session:
+
+```{code-block} python
+---
+caption: noxfile.py
+linenos: true
+lineno-start: 3
+---
+
+@nox.session(python=["3.9", "3.8"])
+def tests(session):
+    try:
+        session.install("pytest", "coverage[toml]", ".")
+        session.run("coverage", "run", "-m", "pytest", *session.posargs)
+    finally:
+        session.notify("coverage")
+```
+
+It would be nice if we could also view the final coverage report
+without having to re-run the entire test suite every time.
+The `coverage combine` command fails if there are no data files.
+But we can use Python's standard library to check for these files,
+and omit the command if there are none:
+
+```{code-block} python
+---
+caption: noxfile.py
+linenos: true
+lineno-start: 11
+---
+
+from pathlib import Path
+
+@nox.session
+def coverage(session):
+    session.install("coverage[toml]")
+
+    if any(Path().glob(".coverage.*")):
+        session.run("coverage", "combine")
+
+    session.run("coverage", "report")
+```
 
 ## Mocking with pytest-mock
 
