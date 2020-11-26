@@ -446,14 +446,16 @@ write a failing test before implementing a feature or fixing a bug.
 
 ![verne-white-dog]
 
-In this section, we update the Nox sessions to collect coverage data when running tests,
-and display a coverage report on the terminal.
-But first we need to configure Coverage.py for its use in Nox environments,
-to account for two differences compared to running in the Poetry environment:
+In this section, we update the Nox session to collect coverage data when running tests.
+We also add a Nox session to display the coverage report on the terminal.
 
-- The test suite in Nox sessions runs against the installed package.
-  In the Poetry environment, they run against the source tree in your working directory.
-- The tests are run with different versions of Python.
+But first we need to configure Coverage.py for its use in Nox environments.
+There are two differences compared to running tests in the Poetry environment
+that we need to account for:
+
+- The Nox session runs the test suite against the installed package.
+  In the Poetry environment, tests run against the source tree in your working directory.
+- Tests are run with different versions of Python.
   Coverage reports should include coverage data from all of them.
 
 To start with, configure Coverage.py to run in [parallel mode][coverage-combine].
@@ -472,9 +474,11 @@ lineno-start: 16
 parallel = true
 ```
 
-Filenames in coverage data point to the installed package in the Nox environments.
-Not only are these paths hard to read, they also depend on the Python version used.
-Let's tell Coverage.py how to map paths to installed modules back to their source code:
+Filenames in coverage data point to the installed package in the Nox environment.
+Not only are those paths hard to read, they also depend on the Python version used.
+Let's tell Coverage.py how to map the paths back to the source code,
+so they are grouped correctly in the coverage report,
+using the `tool.coverage.paths` option:
 
 ```{code-block} toml
 ---
@@ -516,7 +520,9 @@ fail_under = 100
 show_missing = true
 ```
 
-Adapt the Nox session to collect the coverage data when running tests:
+With this in place, we are ready to automate code coverage using Nox.
+
+Adapt the `tests` session to collect coverage data when running tests:
 
 ```{code-block} python
 ---
@@ -551,6 +557,11 @@ def coverage(session):
     session.run("coverage", "combine")
     session.run("coverage", "report")
 ```
+
+As a final touch, we'll make two improvements.
+
+- Use `notify` to make sure coverage is run after tests. This cleans up the data files.
+- Check if the data files exist to avoid failures. If no data files exist, just display a report.
 
 ## Mocking with pytest-mock
 
