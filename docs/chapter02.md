@@ -136,7 +136,7 @@ and a set of commands to run in that environment.
 ```{hint}
 Both Poetry and Nox set up virtual environments for your project.
 While the Poetry environment lets you interact with your package during development,
-Nox environments are useful for running developer tools in a repeatable way across multiple Python versions.
+Nox environments are useful for running checks in a repeatable way across multiple Python versions.
 ```
 
 <!--
