@@ -321,7 +321,7 @@ We have added three configuration options for Coverage.py:
 
 - The `tool.coverage.report.show_missing` option enables the display of line numbers for missing coverage.
 
-Coverage.py comes with a command-line interface named `coverage`, sporting a number of subcommands.
+Coverage.py comes with a command-line interface named `coverage`.
 In the simplest case, checking test coverage is a two-step process:
 
 - `coverage run` executes a script or module (via the `-m` option) and collects coverage data.
@@ -438,7 +438,7 @@ This does not imply that your test suite has meaningful test cases for all uses 
 Take our test case, for example:
 It did not check the functionality of the program at all, only its exit status;
 yet it achieved full coverage.
-A good way to build up meaningful tests is to
+A good way to build up a battery of meaningful tests is to
 write a failing test before implementing a feature or fixing a bug.
 ```
 
