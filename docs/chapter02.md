@@ -208,10 +208,10 @@ nox > * tests-3.8: success
 ```
 
 ```{hint}
-It may seem mysterious how `session.install(".")` gets your package installed.
-[pip], which is what Nox uses behind the scenes,
-will build and install a wheel from any source directory passed to it,
-using the build backend specified in its `pyproject.toml`.
+How does `session.install(".")` actually get your package installed?
+Behind the scenes, Nox forwards `session.install` arguments to [pip].
+When passed a directory with a `pyproject.toml`,
+pip builds and installs a wheel from it using the specified build backend.
 In this case, the directory contains your Python package,
 and the build backend is Poetry.
 ```
