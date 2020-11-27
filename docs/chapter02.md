@@ -439,7 +439,7 @@ Take our test case, for example:
 It did not check the functionality of the program at all, only its exit status;
 yet it achieved full coverage.
 A good way to build up a battery of meaningful tests is to
-write a failing test before implementing a feature or fixing a bug.
+[write a failing test][cartoon-tdd] before implementing a feature or fixing a bug.
 ```
 
 ## Automating coverage using Nox
@@ -761,7 +761,7 @@ because more fine-grained test cases make it easier to figure out
 why the test suite failed when it does.
 
 Tests for a feature or bugfix should be written *before* implementation.
-This is also known as "[writing a failing test]".
+This is also known as "writing a failing test".
 The reason for this is that
 it provides confidence that the tests are actually testing something,
 and do not simply pass because of a flaw in the tests themselves.
@@ -1194,5 +1194,5 @@ by Jules Verne (1870)
 [verne-tower]: images/verne-tower.jpg
 [verne-white-dog]: images/verne-white-dog.jpg
 [wikipedia-language-editions]: https://en.wikipedia.org/wiki/List_of_Wikipedias
-[writing a failing test]: https://www.icemobile.com/uploads/inline/test.driven.development.cartoon_0.jpeg
+[cartoon-tdd]: https://www.icemobile.com/uploads/inline/test.driven.development.cartoon_0.jpeg
 [zsh]: https://www.zsh.org/
