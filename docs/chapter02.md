@@ -603,104 +603,111 @@ def coverage(session):
     session.run("coverage", "report")
 ```
 
-## Mocking with pytest-mock
+## Mocks and Stubs
 
 ![verne-landing]
 
-Unit tests should be [fast, isolated, and repeatable][testing-first-principle].
-The test for `__main__.main` is neither of these:
+Let's take another look at our one and only test case:
+
+```{code-block} python
+---
+caption: tests/test_main.py
+lineno-start: 10
+---
+
+def test_main_succeeds(runner):
+    result = runner.invoke(__main__.main)
+    assert result.exit_code == 0
+```
+
+This type of test is often referred to as an *end-to-end test*,
+because it considers the application flow from start to end,
+and verifies whether the application performs as designed.
+The bulk of your test suite should consist of lower-level types of tests,
+such as unit tests.
+
+Unit tests, as the name says, verify the functionality of a *unit of code*,
+such as a single function or class.
+They should be [fast, isolated, and repeatable][testing-first-principle].
+Note how the test above is neither of these:
 
 - It is not fast,
   because it takes a full round-trip to the Wikipedia API to complete.
-- It does not run in an isolated environment,
-  because it sends out an actual request over the network.
+- It does not isolate an individual failure in the code base, quite to the contrary:
+  it runs the entire program and checks that it exits with success.
 - It is not repeatable,
   because its outcome depends on the health, reachability, and behavior of the API.
   In particular, the test fails whenever the network is down.
 
-The [unittest.mock] standard library allows you to replace parts of your system under test with mock objects.
-Use it via the [pytest-mock] plugin, which integrates the library with `pytest`:
+All of this does not make it a bad test,
+but it does make it a bad *unit* test.
 
-```sh
-poetry add --dev pytest-mock
+pytest's `monkeypatch` fixture allows you to replace 
+
+In this section, we will look at different methods to solve these shortcomings.
+
+
+
+Let's fix these shortcomings by 
+
+The traditional answer to this kind of problem is *mocking*,
+where you replace parts of your code with simulated objects.
+One widely used mocking framework is the [unittest.mock] standard library.
+Here, we will use a more constrained approach in the form of pytest's `monkeypatch` fixture.
+
+Let's start by defining a canned response that we would like test cases to
+receive when they send requests to the Wikipedia API
+(you will need to add `httpx` to the imports for this):
+
+```{code-block} python
+---
+caption: tests/test_main.py
+linenos: true
+lineno-start: 8
+---
+
+API_RESPONSE = httpx.Response(
+    200,
+    json={
+        "title": "Lorem Ipsum",
+        "extract": "Lorem ipsum dolor sit amet",
+    },
+)
 ```
 
-The plugin provides a `mocker` fixture,
-which functions as a thin wrapper around the standard mocking library.
-Use `mocker.patch` to replace the `httpx.get` function by a mock object.
-The mock object will be useful for any test case involving the Wikipedia API,
+Use `monkeypatch.setattr` to replace the `httpx.get` function by a noop that always returns `API_RESPONSE`.
+The monkeypatch will be useful for any test case involving the Wikipedia API,
 so let's create a test fixture for it:
 
 ```python
-# tests/test_main.py
 @pytest.fixture
-def mock_requests_get(mocker):
-    return mocker.patch("requests.get")
+def mock_api(monkeypatch):
+    monkeypatch.setattr("httpx.get", lambda url: API_RESPONSE)
 ```
 
 Add the fixture to the function parameters of the test case:
 
 ```python
-def test_main_succeeds(runner, mock_requests_get):
+def test_main_succeeds(runner, mock_api):
     ...
 ```
     
-If you run Nox now,
-the test fails because click expects to be passed a string for console output,
-and receives a mock object instead.
-Simply "knocking out" `requests.get` is not quite enough.
-The mock object also needs to return something meaningful,
-namely a response with a valid JSON object.
-
-When a mock object is called, or when an attribute is accessed, it returns another mock object.
-Sometimes this is sufficient to get you through a test case.
-When it is not, you need to *configure* the mock object.
-To configure an attribute, you simply set the attribute to the desired value.
-To configure the return value for when the mock is called,
-you set `return_value` on the mock object as if it were an attribute.
-
-Let's look at the example again:
-
-```python
-with requests.get(API_URL) as response:
-    response.raise_for_status()
-    data = response.json()
-```
-
-The code above uses the response as a [context manager].
-The `with` statement is syntactic sugar for the following slightly simplified pseudocode:
-
-```python
-context = requests.get(API_URL)
-response = context.__enter__()
-
-try:
-    response.raise_for_status()
-    data = response.json()
-finally:
-    context.__exit__(...)
-```
-
-So what you have is essentially a chain of function calls:
-
-```python
-data = requests.get(API_URL).__enter__().json()
-```
-
-Rewrite the fixture, and mirror this call chain when you configure the mock:
+If you run the test now,
+an exception is thrown when our program invokes `response.raise_for_status()` on our mock response.
+It turns out that this method assumes that the object was constructed in response to an actual request.
+No problem, we can monkeypatch the method away:
 
 ```python
 @pytest.fixture
-def mock_requests_get(mocker):
-    mock = mocker.patch("requests.get")
-    mock.return_value.__enter__.return_value.json.return_value = {
-        "title": "Lorem Ipsum",
-        "extract": "Lorem ipsum dolor sit amet",
-    }
-    return mock
+def mock_api(monkeypatch):
+    monkeypatch.setattr("httpx.get", lambda url: API_RESPONSE)
+    monkeypatch.setattr(API_RESPONSE, "raise_for_status", lambda: None)
 ```
-    
-Invoke Nox again to see that the test suite passes. 🎉
+
+At this problem, alarm bells may start ringing.
+This is getting very tied to implementation details.
+
+Invoke Nox again to see that the test suite passes:
 
 ```sh
 $ nox -r
