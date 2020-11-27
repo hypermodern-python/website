@@ -450,8 +450,8 @@ In this section, we update the Nox session to collect coverage data when running
 We also add a Nox session to display the coverage report on the terminal.
 
 But first we need to configure Coverage.py for its use in Nox environments.
-There are two differences compared to running tests in the Poetry environment
-that we need to account for:
+Compared to running tests in the Poetry environment,
+there are two differences that we should account for:
 
 - The Nox session runs the test suite against the installed package.
   In the Poetry environment, tests run against the source tree in your working directory.
@@ -542,11 +542,7 @@ def tests(session):
     session.run("coverage", "run", "-m", "pytest", *session.posargs)
 ```
 
-Add a second session named `coverage`.
-This session combines the coverage data from all the test runs.
-It then generates the final coverage report.
-The coverage session runs on the same Python version as Nox itself,
-using the `@nox.session` decorator without arguments.
+Now add a second session named `coverage`:
 
 ```{code-block} python
 ---
@@ -562,6 +558,14 @@ def coverage(session):
     session.run("coverage", "report")
 ```
 
+This session combines the coverage data from all the test runs, using `coverage combine`.
+It then generates and displays the final coverage report, using `coverage report`.
+
+```{note}
+You can use the `@nox.session` decorator without specifying a Python version.
+The session will run on the same Python interpreter as Nox itself.
+```
+
 If you run the `tests` session on its own,
 your working directory will be littered with data files
 waiting to be processed by `coverage combine`.
@@ -575,14 +579,16 @@ If the notified session is not already selected,
 it runs after all other sessions have completed.
 A `try...finally` block ensures that
 we get a coverage report even if a test failed.
-Here's the updated `tests` session:
+
+Here's the full `noxfile.py` with the updated `tests` session:
 
 ```{code-block} python
 ---
 caption: noxfile.py
 linenos: true
-lineno-start: 3
 ---
+
+import nox
 
 @nox.session(python=["3.9", "3.8"])
 def tests(session):
@@ -591,6 +597,12 @@ def tests(session):
         session.run("coverage", "run", "-m", "pytest", *session.posargs)
     finally:
         session.notify("coverage")
+
+@nox.session
+def coverage(session):
+    session.install("coverage[toml]")
+    session.run("coverage", "combine")
+    session.run("coverage", "report")
 ```
 
 ## Mocking with pytest-mock
