@@ -7,13 +7,11 @@ and teach the random fact generator foreign languages.
 - [View changes](https://github.com/cjolowicz/hypermodern-python/compare/chapter01...chapter02)
 - [Download code](https://github.com/cjolowicz/hypermodern-python/archive/chapter02.zip)
 
-## Unit testing with pytest
+## Testing with pytest
 
 ![verne-oxen]
 
-It's never too early to add unit tests to a project. 
-Unit tests, as the name says, verify the functionality of a *unit of code*,
-such as a single function or class.
+It's never too early to add tests to a project. 
 While the [unittest] framework is part of the Python standard library,
 [pytest] has become somewhat of a *de facto* standard.
 
