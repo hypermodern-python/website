@@ -365,7 +365,7 @@ lineno-start: 25
 fail_under = 100
 ```
 
-```{important}
+```{tip}
 Code coverage tells you which lines and branches in your code base were hit.
 This does not imply that your test suite has meaningful test cases for all uses and misuses of your program.
 Take our test case, for example:
