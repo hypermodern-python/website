@@ -21,26 +21,6 @@ using [poetry add] with the `--dev` option:
 poetry add --dev pytest
 ```
 
-<!--
-```{note}
-Dependencies are Python packages used by your project,
-and they come in two types:
-
-- *Core dependencies* are required by users running your code,
-  and typically consist of third-party libraries imported by your package.
-  When your package is distributed,
-  the package metadata includes these dependencies,
-  allowing tools like pip to automatically install them alongside your package.
-
-- *Development dependencies* are only required by developers working on your code.
-  Examples are applications used to run tests,
-  to check code for style and correctness,
-  or to build documentation.
-  These dependencies are not a part of distribution packages,
-  because users do not require them to run your code.
-```
--->
-
 Organize tests in a [separate file hierarchy][pytest-good-practices] next to `src`, named `tests`:
 
 ```sh
@@ -136,29 +116,11 @@ While the Poetry environment lets you interact with your package during developm
 Nox environments are useful for running checks in a repeatable way across multiple Python versions.
 ```
 
-<!--
-Like its older sibling [tox],
-Nox makes it easy to run any kind of job in an isolated environment,
-with only those dependencies installed that the job needs.
--->
-
 Install Nox via [pipx]:
 
 ```sh
 pipx install nox
 ```
-
-<!--
-```{note}
-Do not install Nox as a development dependency with Poetry.
-Nox is a part of your global developer environment, like Poetry, pyenv, and pipx.
-All of these tools are in a sense environment managers.
-It's better to decouple them than to
-enter a complex situation where environments are spawned from other environments.
-To quote the [Zen of Python][PEP 20],
-"Flat is better than nested."
-```
--->
 
 Create a `noxfile.py` with the following contents:
 
@@ -280,13 +242,6 @@ Install it as a development dependency using Poetry:
 poetry add --dev 'coverage[toml]'
 ```
 
-<!--
-```{note}
-Quotes are optional unless your shell is [zsh],
-which assigns special meaning to square brackets.
-```
--->
-
 The `[toml]` [extra][core-metadata-provides-extra] allows
 Coverage.py to read its configuration from `pyproject.toml`.
 Let's add the following contents to this file:
@@ -372,26 +327,6 @@ lineno-start: 24
 if __name__ == "__main__":
     main(prog_name="hypermodern_python")
 ```
-
-<!--
-This is an indicator of missing branch coverage.
-
-The `if` clause is missing from coverage because
-its condition only evaluates to `True` when the module is run as a script.
-
-```{note}
-Branch coverage may seem redundant here, but consider the opposite case:
-If the condition always evaluates to `True`, the body of the `if` statement is never skipped.
-Statement coverage will only see that all lines of code were executed.
-But skipping the body could conceivably break code after the `if` block.
-This specific code path is never executed by the test suite.
-Branch coverage alerts us to this situation.
-```
-
-Exercising this code path from the test suite is not impossible
-(see [runpy] from the standard library for one approach).
-[runpy]: https://docs.python.org/3/library/runpy.html
--->
 
 `if __name__ == "__main__"` blocks are often [excluded from coverage][coverage-excluding-code]:
 They are trivial boilerplate, yet cumbersome to exercise from a test.
@@ -617,7 +552,6 @@ by Jules Verne (1870)
 [Coverage.py]: https://coverage.readthedocs.io/
 [Internet Archive]: https://archive.org/details/delaterrelalu00vern
 [Nox]: https://nox.thea.codes/
-[PEP 20]: https://www.python.org/dev/peps/pep-0020
 [The Public Domain Review]: https://publicdomainreview.org/collection/emile-antoine-bayard-s-illustrations-for-around-the-moon-by-jules-verne-1870
 [core-metadata-provides-extra]: https://packaging.python.org/specifications/core-metadata/#provides-extra-multiple-use
 [coverage-combine]: https://coverage.readthedocs.io/en/coverage-5.3/cmd.html#combining-data-files-coverage-combine
