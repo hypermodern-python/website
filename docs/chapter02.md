@@ -551,18 +551,21 @@ This is a good thing: it makes the checks more reproducible and deterministic.
 
 By comparison, consider our Nox session for `pytest`:
 
+- Core dependencies (`click`) are constrained by the version ranges specified in `pyproject.toml`,
+  not by the version pins in `poetry.lock`.
 - Development dependencies (`pytest` and `coverage`) are installed without any version constraints.
-- Core dependencies are only constrained by the version ranges in the package metadata,
-  as specified in `pyproject.toml`.
   
 Poetry's lock file does not enter the picture here,
-because packages are installed by [pip], not Poetry.
+because packages are installed by [pip], not Poetry,
+and the version pins are not part of the package metadata.
 You could use Poetry to install the packages,
 but this approach comes with its own set of problems:
 
-- Checks run against the source tree instead of the installed package.
-- Poetry installs all development dependencies,
-  but you don't need to install your package in a linting environment,
+- Tests run against the source tree instead of the installed package.
+  You want to make sure that you test the artifact that your end users see,
+  not a potentially dirty work tree.
+- Poetry installs everything: your package, its dependencies, plus all development dependencies.
+  But you don't need to install your package in a linting environment,
   or documentation builders in a test environment.
 
 Fortunately, Poetry can export the lock file into a format that pip understands: the `requirements.txt` format.
@@ -570,12 +573,21 @@ These files can in turn be used as [constraints files][pip-constraints-files],
 where the user specifies which packages are installed,
 and the constraints file only determines the versions of any dependencies involved.
 
-A small package named [nox-poetry] allows you to implement this workflow.
+````{caution}
+As of pip 20.3, constraints files have been redesigned as a strict subset of requirements files.
+You can check if the approach described here works for your package by checking the output of the following command:
 
-```{admonition} Disclaimer
-I am the author of nox-poetry.
+```sh
+poetry export --format=requirements.txt --dev --without-hashes
 ```
 
+Every line in the output must have the form `<package>==<version>`,
+optionally followed by a semicolon and a number of environment markers
+such as `python_version` or `sys_platform`.
+````
+
+A small package named [nox-poetry] allows you to implement this workflow.
+*(Disclaimer: I am the author of this package.)*
 Install nox-poetry into the same environment that Nox is run from:
 
 ```sh
@@ -597,7 +609,7 @@ import nox_poetry.patch
 Re-run Nox and watch it install packages from Poetry's lock file:
 
 ```
-$ nox
+$ nox --python=3.9
 nox > Running session tests-3.9
 nox > Creating virtual environment (virtualenv) using python3.9 in .nox/tests-3-9
 nox > poetry build --format=wheel
@@ -607,15 +619,6 @@ nox > pip install --constraint=.nox/tests-3-9/tmp/requirements.txt pytest covera
 nox > coverage run -m pytest
 ...
 nox > Session tests-3.9 was successful.
-nox > Running session tests-3.8
-nox > Creating virtual environment (virtualenv) using python3.8 in .nox/tests-3-8
-nox > poetry build --format=wheel
-nox > pip uninstall --yes file://.../hypermodern-python/dist/hypermodern_python-0.1.0-py3-none-any.whl#sha256=8c452f404aaeb57819ea4f66a64fc5b9e55502940d764b7ff4c3b228f542441b
-nox > poetry export --format=requirements.txt --output=.nox/tests-3-8/tmp/requirements.txt --dev
-nox > pip install --constraint=.nox/tests-3-8/tmp/requirements.txt pytest coverage[toml] file://.../hypermodern-python/dist/hypermodern_python-0.1.0-py3-none-any.whl#sha256=8c452f404aaeb57819ea4f66a64fc5b9e55502940d764b7ff4c3b228f542441b
-nox > coverage run -m pytest
-...
-nox > Session tests-3.8 was successful.
 nox > Running session coverage
 nox > Creating virtual environment (virtualenv) using python in .nox/coverage
 nox > poetry export --format=requirements.txt --output=.nox/coverage/tmp/requirements.txt --dev
@@ -626,7 +629,6 @@ nox > coverage report
 nox > Session coverage was successful.
 nox > Ran multiple sessions:
 nox > * tests-3.9: success
-nox > * tests-3.8: success
 nox > * coverage: success
 ```
 
