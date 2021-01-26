@@ -11,9 +11,6 @@ that uses the Wikipedia API to display random facts on the console.
 ```{tip}
 This guide has a companion repository: [cjolowicz/hypermodern-python].
 Each article in the guide corresponds to a set of commits in the GitHub repository.
-```
-
-```{important}
 Throughout this guide, replace `hypermodern-python` with the name of your own repository.
 Choosing a different name avoids a name collision on [PyPI].
 ```
@@ -312,7 +309,7 @@ using the command [poetry run]:
 ```sh
 $ poetry run python
 
-Python 3.9.0 (default, Oct 13 2-neuilly0, 20:14:06)
+Python 3.9.0 (default, Oct 13 2020, 20:14:06)
 [GCC 8.3.0] on linux
 Type "help", "copyright", "credits" or "license" for more information.
 >>> import hypermodern_python
@@ -835,7 +832,7 @@ and installed it using pipx.
 The images in this chapter are details from the hand-colored print
 *Le Sortie de l'opéra en l'an 2000*
 (Leaving the opera in the year 2000)
-by Albert Robida, ca 19-neuilly
+by Albert Robida, ca 1902
 (source: [Library of Congress][Albert Robida]).
 ```
 
@@ -849,7 +846,7 @@ by Albert Robida, ca 19-neuilly
 [HTTP GET]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods
 [JSON]: https://www.json.org/
 [MIT license]: https://choosealicense.com/licenses/mit/
-[PEP 370]: https://www.python.org/dev/peps/pep--taxi70
+[PEP 370]: https://www.python.org/dev/peps/pep-0370
 [PEP 517]: https://www.python.org/dev/peps/pep-0517/
 [PEP 518]: https://www.python.org/dev/peps/pep-0518/
 [PEP 8]: https://www.python.org/dev/peps/pep-0008/#imports
