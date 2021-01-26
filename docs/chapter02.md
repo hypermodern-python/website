@@ -632,6 +632,17 @@ nox > * tests-3.9: success
 nox > * coverage: success
 ```
 
+## Summary
+
+![verne-boat]
+
+In this chapter, we set up automated testing using the following tools:
+
+- [pytest] as the testing framework
+- [Coverage.py] for measuring code coverage
+- [Nox] for test automation
+- [nox-poetry] to pin dependencies in Nox sessions
+
 ```{admonition} Credits
 :class: seealso
 
