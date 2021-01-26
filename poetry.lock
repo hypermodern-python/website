@@ -202,7 +202,7 @@ python-versions = ">=3.5"
 
 [[package]]
 name = "pygments-pytest"
-version = "2.1.0"
+version = "2.2.0"
 description = "A pygments lexer for pytest output."
 category = "dev"
 optional = false
@@ -432,7 +432,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "67b53f825974a21dd53637edb43358f97c01b4bd2aedc058423e22d4df9121d2"
+content-hash = "6bd0b7def4b5cab051ec1e2d92649ab88d4681ab435510203581d00cf49034ec"
 
 [metadata.files]
 alabaster = [
@@ -539,8 +539,8 @@ pygments = [
     {file = "Pygments-2.7.2.tar.gz", hash = "sha256:381985fcc551eb9d37c52088a32914e00517e57f4a21609f48141ba08e193fa0"},
 ]
 pygments-pytest = [
-    {file = "pygments_pytest-2.1.0-py2.py3-none-any.whl", hash = "sha256:7cb5aa4ccaecf9a8f3405c49480bbb08317aa18172bef14beefdece9c52c3dde"},
-    {file = "pygments_pytest-2.1.0.tar.gz", hash = "sha256:071f689acadfadc75e766650e0b96a974ba69199245ea4d1c65344e33d0b73ac"},
+    {file = "pygments_pytest-2.2.0-py2.py3-none-any.whl", hash = "sha256:2e441a319878701d9c4d512aabbb3db07683055562856145af5278b102ebbe4d"},
+    {file = "pygments_pytest-2.2.0.tar.gz", hash = "sha256:b4c530d791558af95166110decc210c31384bb4691f0d12bef704172467b3c56"},
 ]
 pyparsing = [
     {file = "pyparsing-2.4.7-py2.py3-none-any.whl", hash = "sha256:ef9d7589ef3c200abe66653d3f1ab1033c3c419ae9b9bdb1240a85b024efc88b"},
