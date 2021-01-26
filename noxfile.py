@@ -31,6 +31,6 @@ def docs(session: Session) -> None:
     """Build and serve the documentation with live reloading on file changes."""
     shutil.rmtree(Path("docs", "_build"), ignore_errors=True)
 
-    args = session.posargs or ["--open-browser", "docs", "docs/_build"]
+    args = session.posargs or ["docs", "docs/_build"]
     session.install("sphinx-autobuild", *sphinx_extensions)
     session.run("sphinx-autobuild", *args)
