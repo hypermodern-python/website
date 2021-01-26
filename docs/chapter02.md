@@ -12,7 +12,7 @@ we're going to add automated testing to your project.
 
 It's never too early to add tests to a project. 
 While the [unittest] framework is part of the Python standard library,
-[pytest] has become somewhat of a *de facto* standard.
+[pytest] can be considered the *de facto* standard of Python testing.
 
 Let's add this package as a development dependency,
 using [poetry add] with the `--dev` option:
@@ -138,7 +138,7 @@ def tests(session):
     session.run("pytest")
 ```
 
-This file defines a session named `tests` that installs and runs pytest.
+This file defines a session named `tests` that installs and runs pytest on Python 3.8 and 3.9.
 The second argument to `session.install` refers to the current directory, containing your Poetry project.
 This means that the session installs your package into the same environment as pytest.
 
@@ -262,11 +262,11 @@ show_missing = true
 
 We have added three configuration options for Coverage.py:
 
-- The `tool.coverage.run.source` option specifies for which packages to collect coverage data.
+- The `tool.coverage.run.source` option specifies the packages for which coverage data should be collected.
   List the name of your package,
   [as well as the test suite][ned-batchelder-blog-include-your-tests] itself.
 
-- The `tool.coverage.run.branch` option activates branch coverage.
+- The `tool.coverage.run.branch` option activates *branch coverage*.
   While statement coverage flags lines of code that are not executed,
   branch coverage allows you to identify uncovered branches in conditional code,
   such as `if...else` constructs.
@@ -393,9 +393,9 @@ there are two differences that we should account for:
 
 To start with, configure Coverage.py to run in [parallel mode][coverage-combine].
 This causes Coverage.py to create separate data files for every run,
-rather than erasing the previous coverage data at each run.
-The data files can be combined later on using the `coverage combine` command.
-Enable parallel mode using the `tool.coverage.run.parallel` option:
+rather than erasing the previous coverage data each time it runs.
+The data files can be combined later on using the command `coverage combine`.
+Enable parallel mode using the option `tool.coverage.run.parallel`:
 
 ```{code-block} toml
 ---
@@ -499,6 +499,7 @@ You can use the `@nox.session` decorator without specifying a Python version.
 The session will run on the same Python interpreter as Nox itself.
 ```
 
+As it stands, the `noxfile.py` has a subtle problem:
 If you run the `tests` session on its own,
 your working directory will be littered with data files
 waiting to be processed by `coverage combine`.
@@ -543,10 +544,10 @@ def coverage(session):
 ![verne-capsule]
 
 In the Poetry environment,
-all installed packages are pinned to specific versions by the `poetry.lock` file.
+all installed packages are pinned to specific versions by virtue of the `poetry.lock` file.
 Checks in the Poetry environment are therefore guaranteed to use the same package versions,
 no matter if they run on your machine, that of a fellow developer, or in CI.
-This is good, because it makes the checks more reproducible and deterministic.
+This is a good thing: it makes the checks more reproducible and deterministic.
 
 By comparison, consider our Nox session for `pytest`:
 
