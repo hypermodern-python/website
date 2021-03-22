@@ -8,7 +8,7 @@ authors = ["Claudio Jolowicz <mail@claudiojolowicz.com>"]
 python = "^3.8"
 
 [tool.poetry.dev-dependencies]
-Sphinx = "^3.4.3"
+Sphinx = "^3.5.3"
 sphinx-autobuild = "^2020.9.1"
 myst-parser = "^0.12.10"
 furo = "^2020.12.30b24"
