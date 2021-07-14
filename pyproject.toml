@@ -9,7 +9,7 @@ python = "^3.8"
 
 [tool.poetry.dev-dependencies]
 Sphinx = "^3.4.3"
-sphinx-autobuild = "^2020.9.1"
+sphinx-autobuild = "^2021.3.14"
 myst-parser = "^0.12.10"
 furo = "^2020.12.30b24"
 pygments-pytest = "^2.2.0"
