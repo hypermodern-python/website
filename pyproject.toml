@@ -11,7 +11,7 @@ python = "^3.8"
 Sphinx = "^3.5.4"
 sphinx-autobuild = "^2021.3.14"
 myst-parser = "^0.15.1"
-furo = "^2020.12.30b24"
+furo = "^2021.6.18b36"
 pygments-pytest = "^2.2.0"
 sphinx-copybutton = "^0.3.1"
 
