@@ -10,7 +10,7 @@ python = "^3.8"
 [tool.poetry.dev-dependencies]
 Sphinx = "^4.3.1"
 sphinx-autobuild = "^2021.3.14"
-myst-parser = "^0.15.2"
+myst-parser = "^0.16.0"
 furo = "^2021.11.23"
 pygments-pytest = "^2.2.0"
 sphinx-copybutton = "^0.4.0"
